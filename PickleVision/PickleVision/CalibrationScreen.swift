@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import PickleVisionCore
 
 struct CalibrationScreen: View {
@@ -12,6 +13,7 @@ struct CalibrationScreen: View {
     @State private var showOverlay = false
     @State private var tapResult: String?
     @State private var venueName = "My Court"
+    @State private var freezeSink: AnyCancellable?
 
     private var draft: CalibrationDraft {
         CalibrationDraft(corners: corners, layout: layout)
@@ -60,6 +62,8 @@ struct CalibrationScreen: View {
         }
         .navigationTitle("Calibrate")
         .onAppear { camera.start(); freeze() }
+        .onChange(of: corners) { tapResult = nil }
+        .onChange(of: layout) { tapResult = nil }
     }
 
     private var tapTestCatcher: some View {
@@ -76,11 +80,23 @@ struct CalibrationScreen: View {
         }
     }
 
+    /// Captures a frozen frame. If no frame has arrived yet (session just
+    /// started), grabs the first one that does.
     private func freeze() {
         if let img = camera.latestImage {
             frozen = img
             frozenSize = camera.imageSize
+            return
         }
+        freezeSink = camera.$latestImage
+            .compactMap { $0 }
+            .first()
+            .receive(on: DispatchQueue.main)
+            .sink { img in
+                frozen = img
+                frozenSize = camera.imageSize
+                freezeSink = nil
+            }
     }
 
     private func save() {

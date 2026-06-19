@@ -20,8 +20,9 @@ struct CameraScreen: View {
         }
         .navigationTitle("Camera")
         .navigationBarTitleDisplayMode(.inline)
+        // Note: we intentionally do NOT stop the session on disappear — pushing
+        // the Calibration screen reuses the same session (and its frame feed).
         .onAppear { camera.start() }
-        .onDisappear { camera.stop() }
     }
 
     private var hud: some View {
