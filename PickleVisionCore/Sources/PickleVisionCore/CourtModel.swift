@@ -29,7 +29,7 @@ public struct CourtModel {
     }
 
     /// Ray-casting point-in-polygon test.
-    static func pointInPolygon(_ p: CGPoint, _ poly: [CGPoint]) -> Bool {
+    private static func pointInPolygon(_ p: CGPoint, _ poly: [CGPoint]) -> Bool {
         guard poly.count >= 3 else { return false }
         var inside = false
         var j = poly.count - 1

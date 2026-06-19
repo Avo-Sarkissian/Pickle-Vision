@@ -20,9 +20,9 @@ final class CourtModelTests: XCTestCase {
         XCTAssertEqual(c.y, 0, accuracy: 1e-6)
     }
 
-    func test_court_to_image_round_trip() {
+    func test_court_to_image_round_trip() throws {
         let model = makeModel()
-        let img = try! XCTUnwrap(model.imagePoint(forCourt: CGPoint(x: 20, y: 44)))
+        let img = try XCTUnwrap(model.imagePoint(forCourt: CGPoint(x: 20, y: 44)))
         XCTAssertEqual(img.x, 200, accuracy: 1e-6)
         XCTAssertEqual(img.y, 48, accuracy: 1e-6)
     }
