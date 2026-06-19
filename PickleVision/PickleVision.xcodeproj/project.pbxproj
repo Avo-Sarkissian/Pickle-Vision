@@ -1,0 +1,615 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D3EFB15A2FE5D5B400960AC9 /* PickleVisionCore in Frameworks */ = {isa = PBXBuildFile; productRef = D3EFB1592FE5D5B400960AC9 /* PickleVisionCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D3EFB1332FE5B52E00960AC9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3EFB11D2FE5B52C00960AC9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3EFB1242FE5B52C00960AC9;
+			remoteInfo = PickleVision;
+		};
+		D3EFB13D2FE5B52E00960AC9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3EFB11D2FE5B52C00960AC9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3EFB1242FE5B52C00960AC9;
+			remoteInfo = PickleVision;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D3EFB1252FE5B52C00960AC9 /* PickleVision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PickleVision.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3EFB1322FE5B52E00960AC9 /* PickleVisionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PickleVisionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3EFB13C2FE5B52E00960AC9 /* PickleVisionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PickleVisionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		D3EFB1272FE5B52C00960AC9 /* PickleVision */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PickleVision;
+			sourceTree = "<group>";
+		};
+		D3EFB1352FE5B52E00960AC9 /* PickleVisionTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PickleVisionTests;
+			sourceTree = "<group>";
+		};
+		D3EFB13F2FE5B52E00960AC9 /* PickleVisionUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PickleVisionUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D3EFB1222FE5B52C00960AC9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3EFB15A2FE5D5B400960AC9 /* PickleVisionCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3EFB12F2FE5B52E00960AC9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3EFB1392FE5B52E00960AC9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D3EFB11C2FE5B52C00960AC9 = {
+			isa = PBXGroup;
+			children = (
+				D3EFB1272FE5B52C00960AC9 /* PickleVision */,
+				D3EFB1352FE5B52E00960AC9 /* PickleVisionTests */,
+				D3EFB13F2FE5B52E00960AC9 /* PickleVisionUITests */,
+				D3EFB1582FE5D5B400960AC9 /* Frameworks */,
+				D3EFB1262FE5B52C00960AC9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D3EFB1262FE5B52C00960AC9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D3EFB1252FE5B52C00960AC9 /* PickleVision.app */,
+				D3EFB1322FE5B52E00960AC9 /* PickleVisionTests.xctest */,
+				D3EFB13C2FE5B52E00960AC9 /* PickleVisionUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D3EFB1582FE5D5B400960AC9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D3EFB1242FE5B52C00960AC9 /* PickleVision */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3EFB1462FE5B52E00960AC9 /* Build configuration list for PBXNativeTarget "PickleVision" */;
+			buildPhases = (
+				D3EFB1212FE5B52C00960AC9 /* Sources */,
+				D3EFB1222FE5B52C00960AC9 /* Frameworks */,
+				D3EFB1232FE5B52C00960AC9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D3EFB1272FE5B52C00960AC9 /* PickleVision */,
+			);
+			name = PickleVision;
+			packageProductDependencies = (
+				D3EFB1592FE5D5B400960AC9 /* PickleVisionCore */,
+			);
+			productName = PickleVision;
+			productReference = D3EFB1252FE5B52C00960AC9 /* PickleVision.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D3EFB1312FE5B52E00960AC9 /* PickleVisionTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3EFB1492FE5B52E00960AC9 /* Build configuration list for PBXNativeTarget "PickleVisionTests" */;
+			buildPhases = (
+				D3EFB12E2FE5B52E00960AC9 /* Sources */,
+				D3EFB12F2FE5B52E00960AC9 /* Frameworks */,
+				D3EFB1302FE5B52E00960AC9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D3EFB1342FE5B52E00960AC9 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D3EFB1352FE5B52E00960AC9 /* PickleVisionTests */,
+			);
+			name = PickleVisionTests;
+			packageProductDependencies = (
+			);
+			productName = PickleVisionTests;
+			productReference = D3EFB1322FE5B52E00960AC9 /* PickleVisionTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D3EFB13B2FE5B52E00960AC9 /* PickleVisionUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3EFB14C2FE5B52E00960AC9 /* Build configuration list for PBXNativeTarget "PickleVisionUITests" */;
+			buildPhases = (
+				D3EFB1382FE5B52E00960AC9 /* Sources */,
+				D3EFB1392FE5B52E00960AC9 /* Frameworks */,
+				D3EFB13A2FE5B52E00960AC9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D3EFB13E2FE5B52E00960AC9 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D3EFB13F2FE5B52E00960AC9 /* PickleVisionUITests */,
+			);
+			name = PickleVisionUITests;
+			packageProductDependencies = (
+			);
+			productName = PickleVisionUITests;
+			productReference = D3EFB13C2FE5B52E00960AC9 /* PickleVisionUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D3EFB11D2FE5B52C00960AC9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					D3EFB1242FE5B52C00960AC9 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					D3EFB1312FE5B52E00960AC9 = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = D3EFB1242FE5B52C00960AC9;
+					};
+					D3EFB13B2FE5B52E00960AC9 = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = D3EFB1242FE5B52C00960AC9;
+					};
+				};
+			};
+			buildConfigurationList = D3EFB1202FE5B52C00960AC9 /* Build configuration list for PBXProject "PickleVision" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D3EFB11C2FE5B52C00960AC9;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D3EFB14F2FE5B67900960AC9 /* XCLocalSwiftPackageReference "../PickleVisionCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D3EFB1262FE5B52C00960AC9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D3EFB1242FE5B52C00960AC9 /* PickleVision */,
+				D3EFB1312FE5B52E00960AC9 /* PickleVisionTests */,
+				D3EFB13B2FE5B52E00960AC9 /* PickleVisionUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D3EFB1232FE5B52C00960AC9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3EFB1302FE5B52E00960AC9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3EFB13A2FE5B52E00960AC9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D3EFB1212FE5B52C00960AC9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3EFB12E2FE5B52E00960AC9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3EFB1382FE5B52E00960AC9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D3EFB1342FE5B52E00960AC9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D3EFB1242FE5B52C00960AC9 /* PickleVision */;
+			targetProxy = D3EFB1332FE5B52E00960AC9 /* PBXContainerItemProxy */;
+		};
+		D3EFB13E2FE5B52E00960AC9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D3EFB1242FE5B52C00960AC9 /* PickleVision */;
+			targetProxy = D3EFB13D2FE5B52E00960AC9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		D3EFB1442FE5B52E00960AC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D3EFB1452FE5B52E00960AC9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D3EFB1472FE5B52E00960AC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AvoSarkissian.PickleVision;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D3EFB1482FE5B52E00960AC9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AvoSarkissian.PickleVision;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D3EFB14A2FE5B52E00960AC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AvoSarkissian.PickleVisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PickleVision.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PickleVision";
+			};
+			name = Debug;
+		};
+		D3EFB14B2FE5B52E00960AC9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AvoSarkissian.PickleVisionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PickleVision.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PickleVision";
+			};
+			name = Release;
+		};
+		D3EFB14D2FE5B52E00960AC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AvoSarkissian.PickleVisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PickleVision;
+			};
+			name = Debug;
+		};
+		D3EFB14E2FE5B52E00960AC9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H74P36C4P7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AvoSarkissian.PickleVisionUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PickleVision;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D3EFB1202FE5B52C00960AC9 /* Build configuration list for PBXProject "PickleVision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3EFB1442FE5B52E00960AC9 /* Debug */,
+				D3EFB1452FE5B52E00960AC9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3EFB1462FE5B52E00960AC9 /* Build configuration list for PBXNativeTarget "PickleVision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3EFB1472FE5B52E00960AC9 /* Debug */,
+				D3EFB1482FE5B52E00960AC9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3EFB1492FE5B52E00960AC9 /* Build configuration list for PBXNativeTarget "PickleVisionTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3EFB14A2FE5B52E00960AC9 /* Debug */,
+				D3EFB14B2FE5B52E00960AC9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3EFB14C2FE5B52E00960AC9 /* Build configuration list for PBXNativeTarget "PickleVisionUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3EFB14D2FE5B52E00960AC9 /* Debug */,
+				D3EFB14E2FE5B52E00960AC9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		D3EFB14F2FE5B67900960AC9 /* XCLocalSwiftPackageReference "../PickleVisionCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../PickleVisionCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D3EFB1592FE5D5B400960AC9 /* PickleVisionCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D3EFB14F2FE5B67900960AC9 /* XCLocalSwiftPackageReference "../PickleVisionCore" */;
+			productName = PickleVisionCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D3EFB11D2FE5B52C00960AC9 /* Project object */;
+}
