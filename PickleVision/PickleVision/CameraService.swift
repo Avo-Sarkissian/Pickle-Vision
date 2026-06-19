@@ -1,5 +1,6 @@
 @preconcurrency import AVFoundation
 import Combine
+import CoreImage
 import QuartzCore
 import PickleVisionCore
 
@@ -14,6 +15,8 @@ final class CameraService: NSObject, ObservableObject {
     @Published private(set) var selectedFormatDescription = "—"
     @Published private(set) var measuredFPS = 0
     @Published private(set) var thermal = ThermalRecommendation(shouldWarn: false, frameRateCap: nil, message: nil)
+    @Published private(set) var latestImage: CGImage?
+    @Published private(set) var imageSize: CGSize = CGSize(width: 1920, height: 1080)
 
     let session = AVCaptureSession()
 
@@ -28,6 +31,8 @@ final class CameraService: NSObject, ObservableObject {
     private var chosenMaxRate: Double = 120
     private var frameTimes: [CFTimeInterval] = []   // touched only on frameQueue
     private var lastPublishedFPS = 0                // touched only on frameQueue
+    private var frameCounter = 0                    // touched only on frameQueue
+    private let ciContext = CIContext()
 
     /// Requests permission if needed, then configures and starts the session.
     func start() {
@@ -175,6 +180,20 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
         if fps != lastPublishedFPS {
             lastPublishedFPS = fps
             publishOnMain { self.measuredFPS = fps }
+        }
+
+        // Throttled frozen-frame snapshot for calibration (every ~10th frame).
+        frameCounter += 1
+        if frameCounter % 10 == 0, let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+            let ci = CIImage(cvPixelBuffer: pixelBuffer)
+            let size = CGSize(width: CVPixelBufferGetWidth(pixelBuffer),
+                              height: CVPixelBufferGetHeight(pixelBuffer))
+            if let cg = ciContext.createCGImage(ci, from: ci.extent) {
+                publishOnMain {
+                    self.latestImage = cg
+                    self.imageSize = size
+                }
+            }
         }
     }
 }
