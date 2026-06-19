@@ -41,8 +41,14 @@ public final class CalibrationStore {
         self.directory = directory
     }
 
+    /// Maps a venue name to a safe filename, neutralizing path separators,
+    /// `..` traversal, and other filesystem-special characters by keeping only
+    /// letters, numbers, spaces, dashes, and underscores.
     private func url(forVenue venue: String) -> URL {
-        let safe = venue.replacingOccurrences(of: "/", with: "_")
+        var safe = String(venue.map { ch in
+            (ch.isLetter || ch.isNumber || ch == " " || ch == "-" || ch == "_") ? ch : "_"
+        })
+        if safe.isEmpty { safe = "venue" }
         return directory.appendingPathComponent("\(safe).json")
     }
 

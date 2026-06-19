@@ -8,6 +8,7 @@ final class CalibrationStoreTests: XCTestCase {
     override func setUpWithError() throws {
         dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("pvcore-tests-" + UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     }
     override func tearDownWithError() throws {
         try? FileManager.default.removeItem(at: dir)
@@ -37,6 +38,20 @@ final class CalibrationStoreTests: XCTestCase {
     func test_load_missing_returns_nil() throws {
         let store = CalibrationStore(directory: dir)
         XCTAssertNil(try store.load(venueName: "Nowhere"))
+    }
+
+    func test_unsafe_venue_name_is_sanitized() throws {
+        let store = CalibrationStore(directory: dir)
+        var cal = sample()
+        cal.venueName = "../../etc/passwd"
+        try store.save(cal)
+        // The file lands inside `dir`, with no path separators in its name.
+        let contents = try FileManager.default.contentsOfDirectory(atPath: dir.path)
+        XCTAssertEqual(contents.count, 1)
+        XCTAssertFalse(contents[0].contains("/"))
+        // It still round-trips by the original venue name (re-sanitized identically).
+        let loaded = try XCTUnwrap(store.load(venueName: "../../etc/passwd"))
+        XCTAssertEqual(loaded, cal)
     }
 
     func test_rebuilds_court_model_from_stored_calibration() throws {
