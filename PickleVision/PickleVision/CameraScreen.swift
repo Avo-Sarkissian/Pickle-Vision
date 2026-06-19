@@ -36,6 +36,15 @@ struct CameraScreen: View {
             }
             .padding()
             Spacer()
+            NavigationLink {
+                CalibrationScreen(camera: camera)
+            } label: {
+                Label("Calibrate court", systemImage: "scope")
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 16).padding(.vertical, 10)
+                    .background(.ultraThinMaterial, in: Capsule())
+            }
+            .padding(.bottom, 30)
         }
     }
 
