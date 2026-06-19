@@ -36,4 +36,34 @@ final class CameraFormatSelectorTests: XCTestCase {
     func test_empty_returns_nil() {
         XCTAssertNil(selector.select(from: []))
     }
+
+    func test_drops_zero_fps_nonvideo_formats() {
+        let candidates = [
+            CameraFormatCandidate(width: 1920, height: 1080, maxFrameRate: 0),
+            CameraFormatCandidate(width: 1920, height: 1080, maxFrameRate: 120),
+        ]
+        XCTAssertEqual(selector.select(from: candidates)?.maxFrameRate, 120)
+    }
+
+    func test_all_zero_fps_returns_nil() {
+        XCTAssertNil(selector.select(from: [
+            CameraFormatCandidate(width: 1920, height: 1080, maxFrameRate: 0),
+        ]))
+    }
+
+    func test_prefers_non_binned_on_tie() {
+        let candidates = [
+            CameraFormatCandidate(width: 1920, height: 1080, maxFrameRate: 120, isBinned: true),
+            CameraFormatCandidate(width: 1920, height: 1080, maxFrameRate: 120, isBinned: false),
+        ]
+        XCTAssertEqual(selector.select(from: candidates)?.isBinned, false)
+    }
+
+    func test_prefers_higher_width_on_tie() {
+        let candidates = [
+            CameraFormatCandidate(width: 1440, height: 1080, maxFrameRate: 120),
+            CameraFormatCandidate(width: 1920, height: 1080, maxFrameRate: 120),
+        ]
+        XCTAssertEqual(selector.select(from: candidates)?.width, 1920)
+    }
 }

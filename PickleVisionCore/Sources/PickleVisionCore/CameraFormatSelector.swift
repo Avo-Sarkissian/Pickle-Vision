@@ -32,8 +32,11 @@ public struct CameraFormatSelector {
     }
 
     /// Returns the best candidate, or `nil` if none are usable. The comparator
-    /// returns `true` when `a` is a better choice than `b`.
+    /// returns `true` when `a` should be ordered before `b` (i.e. `a` is the
+    /// better choice).
     public func select(from candidates: [CameraFormatCandidate]) -> CameraFormatCandidate? {
+        // AVFoundation reports some non-video / still formats with a 0 max frame
+        // rate; ignore anything that cannot sustain at least 1 fps.
         let usable = candidates.filter { $0.maxFrameRate >= 1 }
         guard !usable.isEmpty else { return nil }
         return usable.min { a, b in
