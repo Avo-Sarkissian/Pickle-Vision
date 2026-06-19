@@ -27,6 +27,7 @@ final class CameraService: NSObject, ObservableObject {
     private var pressureObservation: NSKeyValueObservation?
     private var chosenMaxRate: Double = 120
     private var frameTimes: [CFTimeInterval] = []   // touched only on frameQueue
+    private var lastPublishedFPS = 0                // touched only on frameQueue
 
     /// Requests permission if needed, then configures and starts the session.
     func start() {
@@ -46,10 +47,11 @@ final class CameraService: NSObject, ObservableObject {
     }
 
     func stop() {
-        sessionQueue.async { [session] in
+        sessionQueue.async { [weak self, session] in
+            guard let self else { return }
             if session.isRunning { session.stopRunning() }
+            self.publishOnMain { self.isRunning = false }
         }
-        publishOnMain { self.isRunning = false }
     }
 
     // MARK: - Configuration (session queue)
@@ -65,6 +67,8 @@ final class CameraService: NSObject, ObservableObject {
     }
 
     private func configureSession() {
+        guard session.inputs.isEmpty else { return }   // already configured; don't double-add
+
         session.beginConfiguration()
         session.sessionPreset = .inputPriority   // we set device.activeFormat ourselves
 
@@ -166,6 +170,11 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
         frameTimes.append(now)
         frameTimes.removeAll { now - $0 > 1.0 }
         let fps = frameTimes.count
-        publishOnMain { self.measuredFPS = fps }
+        // The rolling 1s count changes at most ~once/sec; only publish on change
+        // rather than once per frame (would be up to 120 Hz).
+        if fps != lastPublishedFPS {
+            lastPublishedFPS = fps
+            publishOnMain { self.measuredFPS = fps }
+        }
     }
 }
