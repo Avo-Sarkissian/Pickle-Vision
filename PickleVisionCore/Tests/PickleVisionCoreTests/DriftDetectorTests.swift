@@ -21,4 +21,10 @@ final class DriftDetectorTests: XCTestCase {
         let d = DriftDetector(translationThreshold: 12, rotationThreshold: 0.02)
         XCTAssertEqual(d.evaluate(translation: 12, rotationRadians: 0), .drifted)
     }
+
+    func test_rotation_threshold_is_inclusive() {
+        let d = DriftDetector(translationThreshold: 12, rotationThreshold: 0.02)
+        XCTAssertEqual(d.evaluate(translation: 0, rotationRadians: 0.02), .drifted)
+        XCTAssertEqual(d.evaluate(translation: 0, rotationRadians: -0.02), .drifted)
+    }
 }

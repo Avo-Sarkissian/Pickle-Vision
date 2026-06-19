@@ -37,4 +37,12 @@ final class CourtModelTests: XCTestCase {
         XCTAssertFalse(model.isInBounds(courtPoint: CGPoint(x: 21, y: 22))) // past sideline
         XCTAssertFalse(model.isInBounds(courtPoint: CGPoint(x: 10, y: 45))) // past baseline
     }
+
+    func test_point_on_line_is_in_bounds() {
+        let model = makeModel()
+        // Pickleball: a ball on the line is in. Exactly-on-boundary points count.
+        XCTAssertTrue(model.isInBounds(courtPoint: CGPoint(x: 20, y: 22)))  // right sideline
+        XCTAssertTrue(model.isInBounds(courtPoint: CGPoint(x: 10, y: 44)))  // far baseline
+        XCTAssertTrue(model.isInBounds(courtPoint: CGPoint(x: 0, y: 0)))    // corner
+    }
 }

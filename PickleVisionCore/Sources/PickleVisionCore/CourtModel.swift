@@ -24,17 +24,23 @@ public struct CourtModel {
     }
 
     /// Whether a court-space point lies inside the in-bounds polygon.
+    /// Line-inclusive: a point exactly on a boundary line counts as in-bounds,
+    /// matching pickleball's rule that a ball touching the line is "in".
     public func isInBounds(courtPoint p: CGPoint) -> Bool {
         Self.pointInPolygon(p, profile.inBoundsPolygon)
+            || Self.isOnBoundary(p, profile.inBoundsPolygon)
     }
 
-    /// Ray-casting point-in-polygon test.
+    /// Ray-casting point-in-polygon test (interior only; boundary handled by
+    /// `isOnBoundary`).
     private static func pointInPolygon(_ p: CGPoint, _ poly: [CGPoint]) -> Bool {
         guard poly.count >= 3 else { return false }
         var inside = false
         var j = poly.count - 1
         for i in 0..<poly.count {
             let pi = poly[i], pj = poly[j]
+            // The `(pi.y > p.y) != (pj.y > p.y)` test excludes horizontal edges,
+            // so `(pj.y - pi.y)` is never zero when the divide runs.
             if ((pi.y > p.y) != (pj.y > p.y)) &&
                (p.x < (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x) {
                 inside.toggle()
@@ -42,5 +48,29 @@ public struct CourtModel {
             j = i
         }
         return inside
+    }
+
+    /// Whether `p` lies on (within a tiny tolerance of) any edge of the polygon.
+    private static func isOnBoundary(_ p: CGPoint, _ poly: [CGPoint], epsilon: Double = 1e-9) -> Bool {
+        let n = poly.count
+        guard n >= 2 else { return false }
+        for i in 0..<n {
+            let a = poly[i], b = poly[(i + 1) % n]
+            if distanceToSegment(p, a, b) <= epsilon { return true }
+        }
+        return false
+    }
+
+    /// Euclidean distance from `p` to the segment `a`–`b`.
+    private static func distanceToSegment(_ p: CGPoint, _ a: CGPoint, _ b: CGPoint) -> Double {
+        let dx = Double(b.x - a.x), dy = Double(b.y - a.y)
+        let px = Double(p.x - a.x), py = Double(p.y - a.y)
+        let len2 = dx * dx + dy * dy
+        if len2 == 0 { return (px * px + py * py).squareRoot() }
+        var t = (px * dx + py * dy) / len2
+        t = max(0, min(1, t))
+        let cx = Double(a.x) + t * dx, cy = Double(a.y) + t * dy
+        let ex = Double(p.x) - cx, ey = Double(p.y) - cy
+        return (ex * ex + ey * ey).squareRoot()
     }
 }
