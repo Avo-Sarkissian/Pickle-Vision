@@ -36,4 +36,12 @@ final class AspectFillMapperTests: XCTestCase {
         XCTAssertEqual(n.x, 0.25, accuracy: 1e-9)
         XCTAssertEqual(n.y, 0.5, accuracy: 1e-9)
     }
+
+    func test_degenerate_sizes_do_not_nan() {
+        let m = AspectFillMapper(viewSize: .zero, contentSize: CGSize(width: 100, height: 100))
+        let n = m.imageNormalized(fromView: CGPoint(x: 10, y: 10))
+        XCTAssertTrue(n.x.isFinite && n.y.isFinite)
+        let v = m.view(fromImageNormalized: CGPoint(x: 0.5, y: 0.5))
+        XCTAssertTrue(v.x.isFinite && v.y.isFinite)
+    }
 }
