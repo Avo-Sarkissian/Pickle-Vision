@@ -19,8 +19,10 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertNotNil(r.message)
     }
 
-    func test_critical_caps_to_30() {
-        XCTAssertEqual(policy.recommendation(for: .critical).frameRateCap, 30)
+    func test_critical_warns_and_caps_to_30() {
+        let r = policy.recommendation(for: .critical)
+        XCTAssertTrue(r.shouldWarn)
+        XCTAssertEqual(r.frameRateCap, 30)
     }
 
     func test_shutdown_pauses_capture() {
@@ -29,7 +31,8 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertTrue(r.shouldWarn)
     }
 
-    func test_level_is_ordered() {
-        XCTAssertTrue(ThermalLevel.nominal < ThermalLevel.critical)
+    func test_levels_sort_in_severity_order() {
+        let shuffled: [ThermalLevel] = [.critical, .nominal, .shutdown, .fair, .serious]
+        XCTAssertEqual(shuffled.sorted(), [.nominal, .fair, .serious, .critical, .shutdown])
     }
 }

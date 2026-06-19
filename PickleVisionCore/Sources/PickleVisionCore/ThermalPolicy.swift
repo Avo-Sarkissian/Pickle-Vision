@@ -1,5 +1,3 @@
-import Foundation
-
 /// Mirrors `AVCaptureDevice.SystemPressureState.Level`, decoupled so the policy
 /// is unit-testable without AVFoundation.
 public enum ThermalLevel: Int, Comparable {
