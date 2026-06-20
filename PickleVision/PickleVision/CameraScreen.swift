@@ -107,8 +107,8 @@ struct CameraScreen: View {
             case .denied:
                 permissionDenied
             case .unknown:
-                Color.black.ignoresSafeArea()
-                ProgressView().tint(.white)
+                PVColor.feedGradient.ignoresSafeArea()
+                ProgressView().tint(PVColor.optic)
             }
         }
         .navigationTitle("Camera")
@@ -178,19 +178,27 @@ struct CameraScreen: View {
     // MARK: - Permission Denied
 
     private var permissionDenied: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "camera.metering.unknown").font(.largeTitle)
-            Text("Camera access is off").font(.headline)
-            Text("Pickle Vision needs the camera to see the court.")
-                .font(.subheadline).foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
+        ZStack {
+            PVColor.feedGradient.ignoresSafeArea()   // dark feed-stand-in background
+            VStack(spacing: 16) {
+                Image(systemName: "camera.metering.unknown")
+                    .font(PVFont.display(44, weight: .regular))
+                    .foregroundStyle(PVColor.optic)
+                Text("Camera access is off")
+                    .font(PVFont.screenTitle)
+                    .foregroundStyle(PVColor.onDark)
+                Text("Pickle Vision needs the camera to see the court. Everything stays on this device.")
+                    .font(PVFont.body)
+                    .foregroundStyle(PVColor.onDark.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 420)
+                PrimaryButton("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .padding(24)
         }
-        .padding()
     }
 }
