@@ -28,7 +28,7 @@ struct SavedCourtCard: View {
 
             Button(action: onReload) {
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(PVFont.ui(16, weight: .semibold))
                     .foregroundStyle(PVColor.ink)
                     .frame(width: 44, height: 44)        // ≥44pt hit target
                     .contentShape(Rectangle())
