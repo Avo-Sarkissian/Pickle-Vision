@@ -35,11 +35,28 @@
 
 ## STATUS
 
-`PHASE 2 — Plans 5 & 6 COMPLETE; building Plan 7 (Camera/Live)`, then Plan 8 (calibration wizard), then engine plans 3.5/4. Each task: implementer subagent → reviewer subagent → fix loop → commit+push, build 0 warnings. Done: **Plan 5 Design System** (PVColor, PVFont, 7 instrument atoms, zone-colored CourtOverlay) + **Plan 6 Menus** (CaptureProfile + store, Home populated + empty, SavedCourtCard, Settings w/ profile-select + manage-courts, History placeholder, nav fully wired incl. express re-cal). 13 tasks, all build clean, on `main`.
+`✅ COMPLETE — the full Direction-B UI is implemented. App builds 0 warnings · 0 navigator issues · PickleVisionCore 77/77 tests. All on main, pushed. Awaiting your on-device test.`
+
+**Built (each task: implementer subagent → reviewer subagent → fix loop → commit + push, build verified 0 warnings):**
+- **Plan 5 Design System** — `PVColor`, `PVFont` (SF Pro/SF Mono), 7 instrument atoms, zone-colored `CourtOverlay`.
+- **Plan 6 Menus** — `CaptureProfile` + persistence, Home (populated + first-launch empty), `SavedCourtCard`, `SettingsView` (profile select + manage/delete courts), `HistoryView` placeholder, full nav incl. express re-cal.
+- **Plan 7 Camera/Live** — restyled HUD (live REC timer + format/fps/thermal), Phase-tagged placeholders, faint decorative court guide, dark permission state.
+- **Plan 8 Calibration wizard** — `FitQuality` + `CalibrationFlow` (TDD core) + the 4-step `Position → Detect → Fine-tune → Verify` flow + custom-dims + 0.5× card; `CalibrationScreen` is now a thin wizard host.
+- **Plan 4 drift-guard UI component** (`DriftGuardOverlay`) — built, not yet wired to live drift (engine deferred).
+
+~31 tasks + ~10 fixes (token literals, a real nav bug, a fake REC timer → live timer, …). **Final whole-UI integration + honesty review: READY** — honesty rule (structural — the auto-detect stub literally can't show a fake %), never-block invariant (enforced in the core type), token discipline, and the full nav graph all PASS.
+
+**DEFERRED — device / real-court dependent (NOT built blind, by design):** Plan 3.5 auto-detect CV engine (the honest stub → manual is live, so the app never blocks); Plan 4 live drift wiring; position-check sensing. See the punch-list.
 
 ## Live progress log
 
 - 2026-06-20 ~02:0x — Run initialized. Mac kept awake (caffeinate ~11h). Mission + contract recorded. Starting Phase 0 (plan expansion).
+- ~02:30 — Phase 0 done: 4 planner subagents expanded Plans 5–8 to bite-sized specs (0c3de49).
+- ~03:00 — Plan 5 (Design System, 4 tasks) complete.
+- ~03:40 — Plan 6 (Menus, 9 tasks) complete — incl. a real fix to a nav bug (PrimaryButton-in-NavigationLink swallowed taps).
+- ~04:00 — Plan 7 (Camera/Live, 4 tasks) complete — incl. fixing a fake "12:04" REC time → live elapsed timer (honesty).
+- ~04:30 — Plan 8 (Calibration wizard, 9 tasks) complete — FitQuality + CalibrationFlow (TDD) + 4-step wizard + edge cases + CalibrationScreen swap.
+- ~04:40 — Plan 4 DriftGuardOverlay UI component built. Final whole-UI integration/honesty review: **READY**. Whole-app build re-verified 0 warnings; core 77/77. Run ended cleanly.
 
 ## Decisions log
 
@@ -63,6 +80,33 @@
 - [ ] History screen: ghost cards currently use a dark panel on the light screen — may want a lighter surface (visual taste); also History has no nav entry yet (decide where it hangs).
 - [ ] Home footer capsule uses `paper` (subtle) vs the brief's `panel` — confirm which reads better.
 
+**Plan 7 — Camera/Live (landscape, dark):**
+- [ ] Camera/Live vs `04-camera-live.png` (edge REC/format/fps + thermal pills, IN/OUT·PHASE2 + SCORE·PHASE6 + SLO-MO placeholders, Calibrate button, faint court guide).
+- [ ] REC pill is a **live** elapsed timer (counts up from screen appear) — confirm it ticks, not a static value.
+- [ ] Permission-denied dark state (revoke camera access in iOS Settings → "Camera access is off" + Open Settings).
+
+**Plan 8 — Calibration wizard (landscape, dark):**
+- [ ] Step 1 Position vs `06` — **Continue anyway** ALWAYS tappable; Calibrate manually; "Won't fit? 0.5×". (Position checks are **hardcoded placeholders** — real CoreMotion/CV sensing is deferred.)
+- [ ] Step 2 Auto-detect vs `07`/`10` — in v1 it always runs "Finding…" → "Couldn't find the court" → manual (CV engine deferred); confirm the manual fallback feels right. (Failed state is a rail card, not yet the centered modal in `10` — visual taste.)
+- [ ] Step 3 Fine-tune vs `08` — drag 4 corners + loupe (now optic-yellow); LAYOUT chips, overlay toggle, Re-freeze, Save→Verify. **EYEBALL THE LOUPE** (the long-standing on-device check).
+- [ ] Step 4 Verify/Save vs `09` — tap-test = IN/OUT + x·y ft (**no ±in**), FIT QUALITY bar, name field, Save court → persists + returns.
+- [ ] Custom-dimensions sheet (Width/Length/Kitchen) + 0.5× ultra-wide card.
+- [ ] **FIT QUALITY caveat:** the bar is a *valid-court* check in v1 (a 4-point fit is ~perfect for any valid quad), NOT a precision measure — real per-zone accuracy is Phase 2. Decide if "Good/Fair" wording over-promises.
+
+**Conscious product decisions to confirm:**
+- [ ] After Save: the **camera path** lands back on the live camera (not Home); the **express re-cal path** lands back on Home and refreshes the list. Confirm that's what you want.
+- [ ] `HistoryView` + `DriftGuardOverlay` are built but **not reachable** in the running app (no nav route / no live trigger). Decide where History hangs; the drift overlay waits on the Plan 4 engine.
+
+**Deferred — device / real-court dependent (NOT built blind):**
+- [ ] **Plan 3.5 auto-detect CV engine** (court line/keypoint detection) — needs a real court to tune; honest stub→manual is live so nothing blocks.
+- [ ] **Plan 4 live drift wiring** (`DriftDetector` + runtime motion/feature-drift trigger → present `DriftGuardOverlay`).
+- [ ] **Position-check sensing** (CoreMotion steady + CV whole-court/mount-height) — currently advisory placeholders.
+- [ ] **Phase-2 numeric layer** (per-zone ±in confidence, tap-test distance-to-line) — intentionally omitted from v1 UI.
+- [ ] **Custom fonts** (Saira/Manrope/Plex Mono) — SF Pro/SF Mono ships fine; bundling the custom faces is optional polish.
+
 ## Build/test state at hand-off
 
-- (final build result + test counts will be recorded here)
+- **App:** BUILD SUCCEEDED · **0 warnings** · 0 navigator issues (Xcode MCP final build, re-verified after the last commit).
+- **PickleVisionCore:** **77 tests, 0 failures.**
+- HEAD = `af55403` on `main`; every task committed + pushed (~33 commits). SDD ledger: `.git/sdd/progress.md`.
+- Full integration/honesty review verdict: **READY**. No Critical/Important blockers.
