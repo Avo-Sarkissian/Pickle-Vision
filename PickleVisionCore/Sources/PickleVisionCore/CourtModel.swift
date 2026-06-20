@@ -25,6 +25,22 @@ public struct CourtModel {
         return q
     }
 
+    /// Minimum distance (feet) from `courtPoint` to any edge of the in-bounds polygon.
+    /// Always >= 0. A point on a boundary edge returns 0.
+    /// Used by LineJudge to determine whether a call falls within the uncertainty band.
+    public func distanceToInBoundsBoundaryFeet(courtPoint p: CGPoint) -> Double {
+        let poly = profile.inBoundsPolygon
+        guard poly.count >= 2 else { return .infinity }
+        var minDist = Double.infinity
+        let n = poly.count
+        for i in 0..<n {
+            let a = poly[i], b = poly[(i + 1) % n]
+            let d = Self.distanceToSegment(p, a, b)
+            if d < minDist { minDist = d }
+        }
+        return minDist
+    }
+
     /// Whether a court-space point lies inside the in-bounds polygon.
     /// Line-inclusive: a point exactly on a boundary line counts as in-bounds,
     /// matching pickleball's rule that a ball touching the line is "in".
