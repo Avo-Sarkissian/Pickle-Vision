@@ -1,16 +1,21 @@
 import CoreGraphics
+import Foundation
 
-/// A v1, honesty-rule-compliant fit indicator: a qualitative bucket plus a
-/// 0–4 segment count for the bar, derived from the homography reprojection
-/// residual of the four calibrated corners. We surface only the label and the
-/// bar in the UI — never the raw residual — because per-zone ± inches are a
-/// Phase-2 (measured-on-court) number we cannot produce yet.
+/// A v1, honesty-rule-compliant calibration *plausibility* indicator. It does
+/// NOT claim per-zone accuracy (that is a Phase-2, measured-on-court number).
+/// Instead it scores how plausible the four tapped corners are as a perspective
+/// view of a real rectangular court, so a sloppy / mis-ordered / off-centre
+/// placement reads worse than a clean one.
+///
+/// Why not a reprojection residual? A 4-point DLT is exactly determined, so
+/// reprojecting the very corners it was fit from returns ~0 for ANY non-degenerate
+/// quad — the residual carried no information and always read "Good". This metric
+/// is computed purely from the quad's shape and genuinely varies with placement.
 public enum FitQuality: Equatable {
     case good
     case fair
 
     /// Convenience segment count for callers that already hold a `FitQuality`.
-    /// `.good` → 4; `.fair` → 1 (the bar uses `barSegments(for:)` for 0–4 resolution).
     public var segments: Int {
         switch self {
         case .good: return 4
@@ -27,44 +32,68 @@ public enum FitQuality: Equatable {
     }
 
     /// Evaluates fit quality from the 4 *normalized* image corners
-    /// ([nearLeft, nearRight, farRight, farLeft]) for the given layout.
-    /// Reprojection residual = mean distance, in normalized image units,
-    /// between each input corner and the corner reprojected by the inverse
-    /// homography (court corner -> image). Degenerate corners -> .fair / 0 segs.
+    /// ([nearLeft, nearRight, farRight, farLeft]). Returns a qualitative bucket
+    /// plus a unitless plausibility `score` in [0, 1] (lower = better), or
+    /// `.infinity` for a degenerate / mis-ordered / non-convex quad. The label
+    /// and the bar are both derived from `barSegments(for:)`, so they can never
+    /// disagree.
     public static func evaluate(corners: [CGPoint],
                                 layout: CourtLayout,
                                 customDimensions: CustomDimensions? = nil)
-    -> (quality: FitQuality, residual: Double) {
-        let r = computeResidual(corners: corners, layout: layout, customDimensions: customDimensions)
-        let q: FitQuality = (r <= 1e-3) ? .good : .fair
-        return (q, r)
+    -> (quality: FitQuality, score: Double) {
+        let s = plausibilityScore(corners)
+        let q: FitQuality = barSegments(for: s) >= 3 ? .good : .fair
+        return (q, s)
     }
 
-    /// 0...4 segments for the bar, given a residual (normalized image units).
-    /// Use this in the view-model/bar UI so the bar can show 0 for degenerate inputs.
-    public static func barSegments(for residual: Double) -> Int {
-        guard residual.isFinite else { return 0 }
-        if residual <= 1e-6 { return 4 }
-        if residual <= 1e-3 { return 3 }
-        if residual <= 1e-2 { return 2 }
+    /// 0...4 segments for the bar, given a plausibility score (lower = better).
+    /// Single source of truth for both the bar and the qualitative label.
+    public static func barSegments(for score: Double) -> Int {
+        guard score.isFinite else { return 0 }
+        if score <= 0.10 { return 4 }
+        if score <= 0.20 { return 3 }
+        if score <= 0.35 { return 2 }
         return 1
     }
 
-    /// Mean reprojection distance, in normalized image units, between each
-    /// input corner and the corresponding court corner mapped back to image
-    /// space via the inverse homography. `.infinity` when no homography exists.
-    private static func computeResidual(corners: [CGPoint],
-                                        layout: CourtLayout,
-                                        customDimensions: CustomDimensions?) -> Double {
+    /// Plausibility of the quad as a perspective image of a rectangle: combines
+    /// top/bottom level-ness with left/right symmetry. Returns `.infinity` when
+    /// the quad is degenerate (too small), mis-ordered, or non-convex
+    /// (self-intersecting) — which is exactly the placement that should read worst.
+    static func plausibilityScore(_ corners: [CGPoint]) -> Double {
         guard corners.count == 4 else { return .infinity }
-        let profile = CourtProfile.make(layout: layout, custom: customDimensions)
-        guard let h = Homography(source: corners, destination: profile.calibrationCorners),
-              let inv = h.inverse else { return .infinity }
-        var sum = 0.0
-        for i in 0..<4 {
-            let back = inv.project(profile.calibrationCorners[i])
-            sum += hypot(Double(back.x - corners[i].x), Double(back.y - corners[i].y))
+        let p = corners.map { (x: Double($0.x), y: Double($0.y)) }
+
+        func sub(_ a: (x: Double, y: Double), _ b: (x: Double, y: Double)) -> (x: Double, y: Double) {
+            (x: a.x - b.x, y: a.y - b.y)
         }
-        return sum / 4.0
+        func len(_ v: (x: Double, y: Double)) -> Double { (v.x * v.x + v.y * v.y).squareRoot() }
+        func cross(_ a: (x: Double, y: Double), _ b: (x: Double, y: Double)) -> Double { a.x * b.y - a.y * b.x }
+
+        // Edge vectors around the quad NL->NR->FR->FL->NL.
+        let e = [sub(p[1], p[0]), sub(p[2], p[1]), sub(p[3], p[2]), sub(p[0], p[3])]
+        let lens = e.map(len)
+        guard let minLen = lens.min(), minLen > 0.03 else { return .infinity }
+
+        // Convexity / correct winding: all four turn cross-products share one sign.
+        let turns = (0..<4).map { cross(e[$0], e[($0 + 1) % 4]) }
+        let pos = turns.filter { $0 > 0 }.count
+        let neg = turns.filter { $0 < 0 }.count
+        guard pos == 4 || neg == 4 else { return .infinity }
+
+        // Top/bottom level-ness: bottom edge (NL->NR) vs top edge (FL->FR) should
+        // be near-parallel for a level (un-rolled) camera.
+        let bottom = e[0]                    // NL -> NR
+        let top    = sub(p[2], p[3])         // FL -> FR
+        let denomTB = len(bottom) * len(top)
+        let cosTB = denomTB > 0 ? max(-1, min(1, (bottom.x * top.x + bottom.y * top.y) / denomTB)) : 1
+        let skewTB = min(acos(cosTB) / (Double.pi / 4), 1)   // 0 at parallel, 1 at >= 45 deg
+
+        // Left/right symmetry: side edges should foreshorten ~equally for a
+        // centred mount. lens[3] = FL->NL (left), lens[1] = NR->FR (right).
+        let left = lens[3], right = lens[1]
+        let imbalance = max(left, right) > 0 ? min(abs(left - right) / max(left, right), 1) : 1
+
+        return 0.5 * skewTB + 0.5 * imbalance
     }
 }

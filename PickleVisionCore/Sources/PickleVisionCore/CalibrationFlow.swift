@@ -45,7 +45,10 @@ public struct CalibrationFlow: Equatable {
         self.step = step
         self.checks = SetupChecks()
         self.autoDetect = .idle
-        self.corners = corners
+        // Guard the never-block invariant: a wrong-count corner array (corrupt or
+        // legacy record) would leave the drag UI without a valid quad. Fall back
+        // to the default starting quad so the user always lands on something editable.
+        self.corners = (corners.count == 4) ? corners : CalibrationDraft.defaultCorners()
         self.layout = layout
         self.customDimensions = customDimensions
         self.overlayVisible = (step == .fineTune || step == .verify)
@@ -65,26 +68,37 @@ public struct CalibrationFlow: Equatable {
 
     public var isComplete: Bool { draft.isComplete }
 
-    public var fitQuality: (quality: FitQuality, residual: Double) {
+    public var fitQuality: (quality: FitQuality, score: Double) {
         FitQuality.evaluate(corners: corners, layout: layout, customDimensions: customDimensions)
     }
 
     // MARK: - Transitions (ALL total, none gated by checks or autoDetect)
 
+    /// Turns the court overlay on whenever a transition lands on a calibrating
+    /// step (fine-tune / verify), so the standard manual path shows the overlay
+    /// to drag — matching express re-cal. The user's toggle can still turn it off
+    /// while on that step; arriving fresh always defaults it on.
+    private mutating func showOverlayIfCalibrating() {
+        if step == .fineTune || step == .verify { overlayVisible = true }
+    }
+
     public mutating func goToStep(_ s: CalibrationStep) {
         step = s
+        showOverlayIfCalibrating()
     }
 
     /// Advance through the step sequence, clamped at .verify.
     public mutating func advance() {
         let next = min(step.rawValue + 1, CalibrationStep.verify.rawValue)
         step = CalibrationStep(rawValue: next)!
+        showOverlayIfCalibrating()
     }
 
     /// Go back through the step sequence, clamped at .position.
     public mutating func back() {
         let prev = max(step.rawValue - 1, CalibrationStep.position.rawValue)
         step = CalibrationStep(rawValue: prev)!
+        showOverlayIfCalibrating()
     }
 
     /// "Continue anyway" from Position. Always succeeds regardless of checks.
@@ -96,6 +110,7 @@ public struct CalibrationFlow: Equatable {
     /// Always allowed from any step.
     public mutating func calibrateManually() {
         step = .fineTune
+        showOverlayIfCalibrating()
     }
 
     /// Begin a stubbed auto-detect. In v1 the engine is not present.
@@ -106,9 +121,18 @@ public struct CalibrationFlow: Equatable {
 
     /// Engine result hook (Plan 3.5 calls this; v1 stub resolves to .failed).
     public mutating func resolveAutoDetect(_ result: AutoDetectState, detectedCorners: [CGPoint]?) {
-        autoDetect = result
-        if result == .found, let c = detectedCorners, c.count == 4 {
-            corners = c
+        if result == .found {
+            if let c = detectedCorners, c.count == 4 {
+                autoDetect = .found
+                corners = c
+            } else {
+                // A "found" without a valid 4-corner quad isn't a real detection;
+                // treat it as failed so the guaranteed manual path stays the
+                // source of truth (never-block invariant).
+                autoDetect = .failed
+            }
+        } else {
+            autoDetect = result
         }
         // On .failed, step is intentionally left unchanged so the manual path stays reachable.
     }
@@ -117,6 +141,7 @@ public struct CalibrationFlow: Equatable {
     /// Corners remain whatever they are — defaults if detect never populated them.
     public mutating func dropToManual() {
         step = .fineTune
+        showOverlayIfCalibrating()
     }
 
     /// Express re-calibration: preload a saved court and land on Fine-tune.

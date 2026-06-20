@@ -70,6 +70,9 @@ import PickleVisionCore
     func tapTestResult() -> (coords: String, inBounds: Bool)? {
         guard let model = flow.courtModel, let tapPoint = flow.tapPoint else { return nil }
         let court = model.courtPoint(forImage: tapPoint)
+        // A tap on the homography's vanishing line maps to a non-finite court
+        // point; show no result rather than "x nan · y nan ft".
+        guard court.x.isFinite, court.y.isFinite else { return nil }
         let inBounds = model.isInBounds(courtPoint: court)
         let coords = String(format: "x %.1f · y %.1f ft", court.x, court.y)
         return (coords, inBounds)

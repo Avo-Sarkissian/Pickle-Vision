@@ -91,4 +91,44 @@ final class CalibrationFlowTests: XCTestCase {
         XCTAssertEqual(f.courtModel?.profile.widthFeet, 18)
         XCTAssertEqual(f.courtModel?.profile.lengthFeet, 40)
     }
+
+    // OVERLAY DEFAULTS ON when a transition lands on a calibrating step (I3).
+    func test_overlay_visible_after_calibrate_manually() {
+        var f = CalibrationFlow()
+        XCTAssertFalse(f.overlayVisible)        // .position
+        f.calibrateManually()
+        XCTAssertEqual(f.step, .fineTune)
+        XCTAssertTrue(f.overlayVisible)
+    }
+
+    func test_overlay_visible_after_advancing_into_finetune() {
+        var f = CalibrationFlow()
+        f.advance()                              // .detect
+        XCTAssertFalse(f.overlayVisible)
+        f.advance()                              // .fineTune
+        XCTAssertTrue(f.overlayVisible)
+    }
+
+    func test_overlay_visible_after_drop_to_manual() {
+        var f = CalibrationFlow()
+        f.startAutoDetect()
+        f.resolveAutoDetect(.failed, detectedCorners: nil)
+        f.dropToManual()
+        XCTAssertTrue(f.overlayVisible)
+    }
+
+    // CORNER-COUNT VALIDATION (M4): wrong-count input never strands the drag UI.
+    func test_invalid_corner_count_falls_back_to_defaults() {
+        let f = CalibrationFlow(corners: [CGPoint(x: 0.1, y: 0.1)])   // only 1 corner
+        XCTAssertEqual(f.corners.count, 4)
+        XCTAssertEqual(f.corners, CalibrationDraft.defaultCorners())
+    }
+
+    func test_found_autodetect_with_invalid_corners_falls_back_to_failed() {
+        var f = CalibrationFlow()
+        f.startAutoDetect()
+        f.resolveAutoDetect(.found, detectedCorners: [CGPoint(x: 0.2, y: 0.9)])  // wrong count
+        XCTAssertEqual(f.autoDetect, .failed)
+        XCTAssertEqual(f.step, .detect)          // not blocked; manual still reachable
+    }
 }

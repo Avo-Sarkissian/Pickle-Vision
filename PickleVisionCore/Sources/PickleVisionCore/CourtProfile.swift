@@ -16,6 +16,14 @@ public struct CustomDimensions: Codable, Equatable {
         self.lengthFeet = lengthFeet
         self.nonVolleyZoneFeet = nonVolleyZoneFeet
     }
+
+    /// A self-consistent court: positive width/length and a non-volley zone that
+    /// fits strictly inside one half of the court (each NVZ line sits between the
+    /// baseline and the net). A larger NVZ would push the kitchen lines outside
+    /// the court rectangle.
+    public var isValid: Bool {
+        widthFeet > 0 && lengthFeet > 0 && nonVolleyZoneFeet > 0 && nonVolleyZoneFeet < lengthFeet / 2
+    }
 }
 
 /// Real-world geometry for a supported court layout, in feet, using the

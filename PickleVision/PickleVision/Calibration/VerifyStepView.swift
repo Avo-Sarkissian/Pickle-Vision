@@ -70,12 +70,12 @@ struct VerifyStepView: View {
                         Spacer(minLength: 4)
                         Text(model.flow.fitQuality.quality.label)
                             .font(PVFont.mono(11, weight: .semibold))
-                            .foregroundStyle(PVColor.inBounds)
+                            .foregroundStyle(model.flow.fitQuality.quality == .good ? PVColor.inBounds : PVColor.amber)
                     }
 
                     // 4-segment bar
                     FitQualityBar(
-                        filledSegments: FitQuality.barSegments(for: model.flow.fitQuality.residual)
+                        filledSegments: FitQuality.barSegments(for: model.flow.fitQuality.score)
                     )
 
                     // Corners set indicator
@@ -89,7 +89,7 @@ struct VerifyStepView: View {
                     }
 
                     // Honesty note
-                    Text("From corner-fit residual. Per-zone ± inches arrive in Phase 2.")
+                    Text("Plausibility of the corner placement. Per-zone ± inches arrive in Phase 2.")
                         .font(PVFont.mono(9, weight: .regular))
                         .foregroundStyle(PVColor.onDarkDim)
                         .fixedSize(horizontal: false, vertical: true)
@@ -162,19 +162,21 @@ struct VerifyCanvasOverlay: View {
                     let dotSize: CGFloat = 10
                     let cardOffsetY: CGFloat = -36
 
-                    // Marker dot
+                    // Marker dot — non-interactive so re-taps fall through to the catcher.
                     Circle()
                         .fill(result.inBounds ? PVColor.inBounds : PVColor.outBounds)
                         .frame(width: dotSize, height: dotSize)
                         .shadow(color: Color.black.opacity(0.4), radius: 4)
                         .position(viewPt)
+                        .allowsHitTesting(false)
 
-                    // Readout card
+                    // Readout card — non-interactive so re-taps near the last point register.
                     TapReadoutCard(
                         coords: result.coords,
                         inBounds: result.inBounds
                     )
                     .position(x: viewPt.x, y: viewPt.y + cardOffsetY)
+                    .allowsHitTesting(false)
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height)

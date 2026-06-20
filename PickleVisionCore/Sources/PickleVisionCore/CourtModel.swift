@@ -18,9 +18,11 @@ public struct CourtModel {
     }
 
     /// Image (pixel) coordinate for a point on the court, or `nil` if the
-    /// homography is non-invertible.
+    /// homography is non-invertible or the point maps onto the vanishing line
+    /// (which would yield a non-finite coordinate).
     public func imagePoint(forCourt p: CGPoint) -> CGPoint? {
-        homography.inverse?.project(p)
+        guard let q = homography.inverse?.project(p), q.x.isFinite, q.y.isFinite else { return nil }
+        return q
     }
 
     /// Whether a court-space point lies inside the in-bounds polygon.
