@@ -77,9 +77,13 @@ struct CameraScreen: View {
     @State private var goCalibrate = false
 
     private let profile: CaptureProfile
+    private let court: CourtModel?
+    private let courtName: String?
 
-    init(profile: CaptureProfile = .auto) {
+    init(profile: CaptureProfile = .auto, court: CourtModel? = nil, courtName: String? = nil) {
         self.profile = profile
+        self.court = court
+        self.courtName = courtName
     }
 
     var body: some View {
@@ -88,13 +92,18 @@ struct CameraScreen: View {
             case .authorized:
                 CameraPreviewView(camera: camera)
                     .ignoresSafeArea()
-                // Faint decorative court guide — static, pre-calibration, behind chrome.
-                DecorativeCourtGuide()
-                    .opacity(0.28)
-                    .padding(.horizontal, 80)
-                    .padding(.vertical, 40)
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea()
+                // Calibrated overlay when a court is present; decorative guide otherwise.
+                if let court {
+                    CourtOverlay(model: court, imageSize: camera.imageSize)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                } else {
+                    DecorativeCourtGuide()
+                        .opacity(0.28)
+                        .padding(.horizontal, 80).padding(.vertical, 40)
+                        .allowsHitTesting(false)
+                        .ignoresSafeArea()
+                }
                 VStack {
                     topRow
                     Spacer()
@@ -141,8 +150,17 @@ struct CameraScreen: View {
         HStack(alignment: .top) {
             topLeftCluster
             Spacer(minLength: 12)
-            DashedPlaceholder("IN / OUT CALLS · PHASE 2")
-                .allowsHitTesting(false)
+            VStack(spacing: 4) {
+                DashedPlaceholder("IN / OUT CALLS · PHASE 2")
+                    .allowsHitTesting(false)
+                if let name = courtName {
+                    InstrumentPill(name, tint: PVColor.optic)
+                    Text("Saved map - re-tap with Calibrate if the camera moved")
+                        .font(PVFont.mono(9))
+                        .foregroundStyle(PVColor.onDarkDim)
+                        .multilineTextAlignment(.center)
+                }
+            }
             Spacer(minLength: 12)
             thermalCluster
         }
@@ -218,4 +236,43 @@ struct CameraScreen: View {
             .padding(24)
         }
     }
+}
+
+// MARK: - Preview
+
+#Preview("CameraScreen - with calibrated court overlay") {
+    // Build a CourtModel from normalized [0,1] corners (same pattern as CourtOverlay preview).
+    // Order: [nearLeft, nearRight, farRight, farLeft] — near (wide) at bottom, far (narrow) at top.
+    let profile = CourtProfile.make(layout: .regulationPickleball)
+    let imgCorners = [
+        CGPoint(x: 0.18, y: 0.82),  // nearLeft
+        CGPoint(x: 0.82, y: 0.82),  // nearRight
+        CGPoint(x: 0.64, y: 0.30),  // farRight
+        CGPoint(x: 0.36, y: 0.30),  // farLeft
+    ]
+    let model: CourtModel? = Homography(source: imgCorners, destination: profile.calibrationCorners)
+        .map { CourtModel(profile: profile, homography: $0) }
+
+    return ZStack {
+        PVColor.feedGradient.ignoresSafeArea()
+        if let model {
+            // Simulate the overlay on a feed-gradient stand-in (camera not available in preview).
+            let imageSize = CGSize(width: 1280, height: 720)
+            CourtOverlay(model: model, imageSize: imageSize)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+        }
+    }
+    .overlay(alignment: .top) {
+        if let model {
+            VStack(spacing: 4) {
+                InstrumentPill("Riverside - Court 3", tint: PVColor.optic)
+                Text("Saved map - re-tap with Calibrate if the camera moved")
+                    .font(PVFont.mono(9))
+                    .foregroundStyle(PVColor.onDarkDim)
+            }
+            .padding(.top, 16)
+        }
+    }
+    .frame(width: 560, height: 315)  // landscape, like the live camera
 }

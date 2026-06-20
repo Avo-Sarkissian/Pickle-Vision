@@ -6,6 +6,7 @@ import PickleVisionCore
 /// affordance. Shows ONLY persisted fields (honesty rule).
 struct SavedCourtCard: View {
     let calibration: StoredCalibration
+    var onStart: () -> Void
     let onReload: () -> Void
 
     var body: some View {
@@ -13,16 +14,22 @@ struct SavedCourtCard: View {
             CourtThumbnail(calibration: calibration)
                 .frame(width: 56, height: 44)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(calibration.venueName)
-                    .font(PVFont.ui(15, weight: .semibold))
-                    .foregroundStyle(PVColor.ink)
-                    .lineLimit(1)
-                Text(metadataLine)
-                    .font(PVFont.ui(12))
-                    .foregroundStyle(PVColor.mutedLight)
-                    .lineLimit(2)
+            Button(action: onStart) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(calibration.venueName)
+                        .font(PVFont.ui(15, weight: .semibold))
+                        .foregroundStyle(PVColor.ink)
+                        .lineLimit(1)
+                    Text(metadataLine)
+                        .font(PVFont.ui(12))
+                        .foregroundStyle(PVColor.mutedLight)
+                        .lineLimit(2)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Start session at \(calibration.venueName)")
 
             Spacer(minLength: 8)
 
@@ -127,6 +134,7 @@ private struct CourtThumbnail: View {
             customDimensions: nil,
             savedAt: Date().addingTimeInterval(-2 * 86_400)
         ),
+        onStart: {},
         onReload: {}
     )
     .padding()
@@ -147,6 +155,7 @@ private struct CourtThumbnail: View {
             customDimensions: nil,
             savedAt: Date().addingTimeInterval(-5 * 3_600)
         ),
+        onStart: {},
         onReload: {}
     )
     .padding()
@@ -171,6 +180,7 @@ private struct CourtThumbnail: View {
             ),
             savedAt: Date().addingTimeInterval(-90)
         ),
+        onStart: {},
         onReload: {}
     )
     .padding()

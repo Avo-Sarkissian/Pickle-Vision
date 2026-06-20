@@ -52,6 +52,13 @@ struct HomeView: View {
                     // live camera), so Save dismisses back here to Home and the
                     // newly-saved court appears in the list (onAppear reloads).
                     CalibrationScreen(camera: CameraService())
+                case .session(let id):
+                    if let cal = store.load(id: id), let model = CalibrationStore.courtModel(from: cal) {
+                        CameraScreen(profile: profileStore.profile, court: model, courtName: cal.venueName)
+                    } else {
+                        // Court unreadable: fall back to a generic session.
+                        CameraScreen(profile: profileStore.profile)
+                    }
                 }
             }
         }
@@ -62,6 +69,7 @@ struct HomeView: View {
         case calibrate
         case settings
         case recalibrate(id: UUID)
+        case session(id: UUID)
     }
 
     // MARK: Header
@@ -108,7 +116,11 @@ struct HomeView: View {
                 .padding(.top, 12)
 
             PrimaryButton("Start a session →") {
-                path.append(.camera)
+                if let first = courts.first {
+                    path.append(.session(id: first.id))
+                } else {
+                    path.append(.camera)
+                }
             }
             .padding(.top, 22)
 
@@ -127,9 +139,9 @@ struct HomeView: View {
 
             VStack(spacing: 10) {
                 ForEach(courts) { cal in
-                    SavedCourtCard(calibration: cal) {
-                        path.append(.recalibrate(id: cal.id))
-                    }
+                    SavedCourtCard(calibration: cal,
+                                   onStart:  { path.append(.session(id: cal.id)) },
+                                   onReload: { path.append(.recalibrate(id: cal.id)) })
                 }
             }
 
@@ -436,7 +448,7 @@ struct HomeView: View {
                 .padding(.bottom, 12)
                 VStack(spacing: 10) {
                     ForEach(courts) { cal in
-                        SavedCourtCard(calibration: cal) {}
+                        SavedCourtCard(calibration: cal, onStart: {}, onReload: {})
                     }
                 }
                 HStack(spacing: 8) {
