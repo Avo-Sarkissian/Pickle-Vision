@@ -65,6 +65,33 @@ public final class CalibrationStore {
         return try JSONDecoder().decode(StoredCalibration.self, from: data)
     }
 
+    /// All saved calibrations, newest first by `savedAt`. Skips unreadable or
+    /// non-JSON entries so one corrupt file can't hide the rest. Returns `[]`
+    /// if the directory doesn't exist yet.
+    public func loadAll() -> [StoredCalibration] {
+        guard let entries = try? fileManager.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ) else { return [] }
+        let decoder = JSONDecoder()
+        let calibrations = entries
+            .filter { $0.pathExtension == "json" }
+            .compactMap { url -> StoredCalibration? in
+                guard let data = try? Data(contentsOf: url) else { return nil }
+                return try? decoder.decode(StoredCalibration.self, from: data)
+            }
+        return calibrations.sorted { $0.savedAt > $1.savedAt }
+    }
+
+    /// Removes the persisted calibration for the given venue name. No-ops if the
+    /// file does not exist (idempotent). Throws only on genuine filesystem errors.
+    public func delete(venueName: String) throws {
+        let u = url(forVenue: venueName)
+        guard fileManager.fileExists(atPath: u.path) else { return }
+        try fileManager.removeItem(at: u)
+    }
+
     /// Recomputes a live `CourtModel` from a stored calibration, or `nil` if
     /// the corners are degenerate.
     public func courtModel(from calibration: StoredCalibration) -> CourtModel? {
