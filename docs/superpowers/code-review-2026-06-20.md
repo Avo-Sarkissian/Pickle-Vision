@@ -72,7 +72,22 @@ Adversarial verification killed 19 plausible-but-wrong findings, including: wron
 
 ---
 
-## Suggested fix order
+## Resolution — all 23 confirmed + 3 environment findings fixed (same session)
+
+Implemented and verified across 5 committed batches on local `main` (push pending user OK).
+Final state: **PickleVisionCore 91/91** (`swift test`), **app builds 0 warnings / 0 navigator issues**, **PickleVisionTests 5/5** on the iOS 26.5 simulator.
+
+| Commit | Batch | Findings |
+|---|---|---|
+| `fc4093f` | calibration correctness | I2, I3, M1, M3, M4, M9, M2 |
+| `252a606` | storage integrity | I1, I4, I8, M5 |
+| `13d6355` | camera | I5, I6, I9, M7, M8, E1 |
+| `5f763dd` | calibration UI + polish | I7, M6, M10, E3 |
+| `b665be6` | app tests | E2 |
+
+Product decisions taken (user-approved): **I2** reworked into a shape-based plausibility metric (not removed); **I9** the fps cap was lifted so the selected profile's rate applies; **E2** real app tests added to the existing `PickleVisionTests` target. The 19 refuted findings were left as-is (verified not-a-bug).
+
+## Suggested fix order (historical — see Resolution above)
 
 1. **Safety / correctness, low-risk, single clear fix:** I5 (thermal pause), I6 (stop session on background), I3 (overlay visible), I7 (drag grab-offset), M1 (project NaN guard), M4/M5 (corner-count validation), E1 (preview warning).
 2. **Data integrity:** I1 (UUID-keyed storage), I8 (re-cal rename), I4 (custom-dims invariant), M6 (NVZ bounds).
