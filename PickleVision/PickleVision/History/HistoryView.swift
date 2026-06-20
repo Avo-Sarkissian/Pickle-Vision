@@ -6,12 +6,16 @@ import PickleVisionCore
 struct HistoryView: View {
     @State private var clips: [SessionClip] = []
 
-    private let clipStore = ClipStore(
-        directory: URL.documentsDirectory.appendingPathComponent("clips")
-    )
-    private let calStore = CalibrationStore(
-        directory: URL.documentsDirectory.appendingPathComponent("calibrations")
-    )
+    private let clipStore: ClipStore
+    private let calStore: CalibrationStore
+
+    init(
+        clipsDirectory: URL = URL.documentsDirectory.appendingPathComponent("clips"),
+        calibrationsDirectory: URL = URL.documentsDirectory.appendingPathComponent("calibrations")
+    ) {
+        clipStore = ClipStore(directory: clipsDirectory)
+        calStore = CalibrationStore(directory: calibrationsDirectory)
+    }
 
     var body: some View {
         ScrollView {
@@ -118,28 +122,44 @@ struct HistoryView: View {
 // MARK: - Preview
 
 #Preview {
-    let tmpDir = FileManager.default.temporaryDirectory
+    let tmp = FileManager.default.temporaryDirectory
         .appendingPathComponent("pv_history_preview_\(Int.random(in: 0..<999999))")
-    let previewStore = ClipStore(directory: tmpDir)
-    let courtID = UUID()
-    let samples: [SessionClip] = [
-        SessionClip(courtID: courtID, fileName: "clip1.mov", fps: 60,
-                    frameWidth: 1920, frameHeight: 1080,
-                    recordedAt: Date().addingTimeInterval(-300)),
-        SessionClip(courtID: UUID(), fileName: "clip2.mov", fps: 30,
-                    frameWidth: 1920, frameHeight: 1080,
-                    recordedAt: Date().addingTimeInterval(-3600 * 25)),
-    ]
-    try? samples.forEach { try previewStore.save($0) }
+    let calDir = tmp.appendingPathComponent("calibrations")
+    let clipsDir = tmp.appendingPathComponent("clips")
 
-    struct PreviewWrapper: View {
-        let store: ClipStore
-        @State private var clips: [SessionClip] = []
-        var body: some View {
-            NavigationStack {
-                HistoryView()
-            }
-        }
+    let calStore = CalibrationStore(directory: calDir)
+    let courtA = UUID()
+    let courtB = UUID()
+    let corners: [CodablePoint] = [
+        CodablePoint(x: 0.1, y: 0.8),
+        CodablePoint(x: 0.9, y: 0.8),
+        CodablePoint(x: 0.9, y: 0.2),
+        CodablePoint(x: 0.1, y: 0.2),
+    ]
+    try? calStore.save(StoredCalibration(
+        id: courtA, venueName: "Riverside Courts",
+        layout: .regulationPickleball, imageCorners: corners,
+        customDimensions: nil, savedAt: Date().addingTimeInterval(-7200)
+    ))
+    try? calStore.save(StoredCalibration(
+        id: courtB, venueName: "Gym Court 3",
+        layout: .regulationPickleball, imageCorners: corners,
+        customDimensions: nil, savedAt: Date().addingTimeInterval(-86400)
+    ))
+
+    let clipStore = ClipStore(directory: clipsDir)
+    try? clipStore.save(SessionClip(
+        courtID: courtA, fileName: "clip1.mov", fps: 60,
+        frameWidth: 1920, frameHeight: 1080,
+        recordedAt: Date().addingTimeInterval(-300)
+    ))
+    try? clipStore.save(SessionClip(
+        courtID: courtB, fileName: "clip2.mov", fps: 30,
+        frameWidth: 1920, frameHeight: 1080,
+        recordedAt: Date().addingTimeInterval(-3600 * 25)
+    ))
+
+    return NavigationStack {
+        HistoryView(clipsDirectory: clipsDir, calibrationsDirectory: calDir)
     }
-    return NavigationStack { HistoryView() }
 }
