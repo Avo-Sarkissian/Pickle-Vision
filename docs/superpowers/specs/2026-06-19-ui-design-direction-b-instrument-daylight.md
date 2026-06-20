@@ -36,21 +36,26 @@ Implemented via a `UIApplicationDelegate.supportedInterfaceOrientationsFor` driv
 
 ## 4. Palette
 
-Approximate tokens (tune to the design file's exact values when available):
+**Revised in the 2nd design pass:** the instrument accent moved from cyan to **optic-yellow** (highest legibility on dark video in full sun), and the court overlay is **zone-colored** — blue in-bounds, green apron. Approximate tokens (tune to the design file's exact values):
 
 **Light · menus**
 - `paper` — warm off-white background `~#E8E7E1`
 - `ink` — near-black text/surfaces `~#15181C`
-- `cyan` — teal action accent `~#1B8DA8`
-- `out` — red, out-of-bounds / destructive `~#E8472B`
+- `in` — blue, in-bounds zone `~#3B6FE0`
+- `out` — green, apron / out-of-bounds zone `~#3FBF5F`
+- primary action — **optic-yellow** `~#D4F23A` (Start a session, Apply, Continue anyway…)
+- destructive — red, reserved for Delete only `~#E8472B`
 
 **Dark · video overlay**
 - `feed` — near-black video letterbox `~#0A0E12`
-- `panel` — overlay card fill `~#0E1620` (cyan-hairline border)
-- `live` — bright cyan, primary instrument lines/handles `~#35D6F2`
+- `panel` — overlay card fill `~#0E1620` (optic-yellow hairline border)
+- `overlay` — **optic-yellow** computed instrument lines / handles / primary `~#D4F23A`
 - `warn` — amber, thermal / drift / caution `~#E9A93A`
+- court zones — in-bounds **blue**, apron **green** (the computed lines themselves stay optic-yellow)
 
-Semantic use: cyan = active/measured, green = pass, amber = caution (thermal, drift, "raise mount"), red = OUT/destructive. Color is never the only signal — always paired with text (IN/OUT, COOLING, etc.).
+Semantic use: optic-yellow = computed/active, blue = in-bounds zone, green = apron/out zone, amber = caution (thermal, drift, "raise mount"), red = destructive only. Color is never the only signal — always paired with text (IN/OUT, COOLING…).
+
+**OPEN DECISION — IN/OUT verdict color (resolve before Phase 2).** Phase-2 call badges currently read IN=blue / OUT=green to match the spatial zones. Internally consistent, but inverts the strong cultural prior (green=in / red=out; Hawk-Eye shows OUT red) — a green "OUT" can misread at a glance. Lean: keep blue/green for the spatial court overlay, but give the verdict badge a judgment palette (OUT in amber or red). Not blocking now (Phase 2 element).
 
 ## 5. Type
 
@@ -110,6 +115,10 @@ Runtime: `CALLS PAUSED` pill + "Mount moved — re-aligning" card, "The court no
 - **Express re-calibrate path** — Home re-cal icon jumps a saved court straight to Fine-tune (skip position/detect).
 - **Make "verify" functional** — prompt tap on a known line, show residual.
 - **Capture-profile parity** — confirm each Settings option maps to a real `CameraFormatSelector` format.
+
+## 8a. Verified against the repo (2026-06-20)
+
+The 2nd design pass's layout numbers were checked against `CourtProfile`/`CustomDimensions` and **match**: regulation pickleball **20×44 · NVZ 7**, tennis front-box **27×42 · NVZ 7**, custom = user `CustomDimensions(widthFeet, lengthFeet, nonVolleyZoneFeet)` (Custom card's Width / Length / Kitchen (NVZ)). The Home saved-court dims and the "Court layouts" atom are accurate, not decorative. The honest-confidence and never-hard-block fixes are fully reflected (numbers quarantined to a "Phase 2 · aspirational" row; Continue-anyway / Calibrate-manually / auto-detect-fail states all present).
 
 ## 9. Phase tagging (what's real now vs later)
 
