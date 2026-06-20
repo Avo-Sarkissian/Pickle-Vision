@@ -16,7 +16,21 @@ struct CameraScreen: View {
             case .authorized:
                 CameraPreviewView(session: camera.session)
                     .ignoresSafeArea()
-                hud
+                VStack {
+                    topRow
+                    Spacer()
+                    NavigationLink {
+                        CalibrationScreen(camera: camera)
+                    } label: {
+                        Label("Calibrate court", systemImage: "scope")
+                            .font(PVFont.ui(14, weight: .semibold))
+                            .padding(.horizontal, 16).padding(.vertical, 10)
+                            .background(.ultraThinMaterial, in: Capsule())
+                    }
+                    .padding(.bottom, 30)
+                }
+                .padding(16)
+                .ignoresSafeArea(.container, edges: .horizontal)
             case .denied:
                 permissionDenied
             case .unknown:
@@ -32,29 +46,34 @@ struct CameraScreen: View {
         .onAppear { camera.start(profile: profile) }
     }
 
-    private var hud: some View {
-        VStack {
-            HStack(spacing: 10) {
-                pill(camera.selectedFormatDescription)
-                pill("\(camera.measuredFPS) fps")
-                if camera.thermal.shouldWarn, let msg = camera.thermal.message {
-                    pill(msg, warning: true)
-                }
-                Spacer()
-            }
-            .padding()
-            Spacer()
-            NavigationLink {
-                CalibrationScreen(camera: camera)
-            } label: {
-                Label("Calibrate court", systemImage: "scope")
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 16).padding(.vertical, 10)
-                    .background(.ultraThinMaterial, in: Capsule())
-            }
-            .padding(.bottom, 30)
+    // MARK: - HUD
+
+    /// Top row: left cluster (REC + format + fps) and right cluster (thermal, conditional).
+    private var topRow: some View {
+        HStack(alignment: .top) {
+            topLeftCluster
+            Spacer(minLength: 12)
+            thermalCluster
         }
     }
+
+    /// Top-left instrument cluster — REC readout + live format + live fps.
+    private var topLeftCluster: some View {
+        HStack(spacing: 8) {
+            StatusReadout(label: "REC", value: "12:04", dotColor: PVColor.recordRed)
+            InstrumentPill(camera.selectedFormatDescription)
+            InstrumentPill("\(camera.measuredFPS) fps")
+        }
+    }
+
+    /// Top-right — amber thermal pill, only when the policy says to warn.
+    @ViewBuilder private var thermalCluster: some View {
+        if camera.thermal.shouldWarn, let msg = camera.thermal.message {
+            InstrumentPill(systemImage: "thermometer.medium", msg, tint: PVColor.amber)
+        }
+    }
+
+    // MARK: - Permission Denied
 
     private var permissionDenied: some View {
         VStack(spacing: 16) {
@@ -71,14 +90,5 @@ struct CameraScreen: View {
             .buttonStyle(.borderedProminent)
         }
         .padding()
-    }
-
-    private func pill(_ text: String, warning: Bool = false) -> some View {
-        Text(text)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 10).padding(.vertical, 6)
-            .background(warning ? Color.orange.opacity(0.9) : Color.black.opacity(0.55))
-            .foregroundStyle(.white)
-            .clipShape(Capsule())
     }
 }
