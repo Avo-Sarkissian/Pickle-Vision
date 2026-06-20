@@ -160,10 +160,9 @@ struct HomeView: View {
                 .foregroundStyle(PVColor.mutedLight)
                 .padding(.top, 12)
 
-            NavigationLink(value: NavRoute.camera) {
-                PrimaryButton("Set up your first court →") {}
+            PrimaryButton("Set up your first court →") {
+                path.append(.camera)
             }
-            .buttonStyle(.plain)
             .padding(.top, 22)
 
             Text("SAVED COURTS")
@@ -261,11 +260,8 @@ struct HomeView: View {
                                 .foregroundStyle(PVColor.mutedLight)
                                 .padding(.top, 12)
 
-                            NavigationLink(value: HomeView.NavRoute.camera) {
-                                PrimaryButton("Set up your first court →") {}
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.top, 22)
+                            PrimaryButton("Set up your first court →") {}
+                                .padding(.top, 22)
 
                             Text("SAVED COURTS")
                                 .font(PVFont.mono(11, weight: .semibold))
