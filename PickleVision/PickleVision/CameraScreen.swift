@@ -3,6 +3,7 @@ import PickleVisionCore
 
 struct CameraScreen: View {
     @StateObject private var camera = CameraService()
+    @State private var recStart: Date = .now
 
     private let profile: CaptureProfile
 
@@ -43,7 +44,10 @@ struct CameraScreen: View {
         .lockOrientation(.landscape)
         // Note: we intentionally do NOT stop the session on disappear — pushing
         // the Calibration screen reuses the same session (and its frame feed).
-        .onAppear { camera.start(profile: profile) }
+        .onAppear {
+            recStart = .now
+            camera.start(profile: profile)
+        }
     }
 
     // MARK: - HUD
@@ -60,7 +64,14 @@ struct CameraScreen: View {
     /// Top-left instrument cluster — REC readout + live format + live fps.
     private var topLeftCluster: some View {
         HStack(spacing: 8) {
-            StatusReadout(label: "REC", value: "12:04", dotColor: PVColor.recordRed)
+            TimelineView(.periodic(from: recStart, by: 1)) { context in
+                let elapsed = Int(context.date.timeIntervalSince(recStart))
+                StatusReadout(
+                    label: "REC",
+                    value: String(format: "%d:%02d", elapsed / 60, elapsed % 60),
+                    dotColor: PVColor.recordRed
+                )
+            }
             InstrumentPill(camera.selectedFormatDescription)
             InstrumentPill("\(camera.measuredFPS) fps")
         }
