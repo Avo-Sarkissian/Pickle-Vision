@@ -47,6 +47,11 @@ struct HomeView: View {
                         // Fallback: venue no longer on disk — start fresh camera path.
                         CameraScreen(profile: profileStore.profile)
                     }
+                case .calibrate:
+                    // First-time setup: calibrate directly (not nested under the
+                    // live camera), so Save dismisses back here to Home and the
+                    // newly-saved court appears in the list (onAppear reloads).
+                    CalibrationScreen(camera: CameraService())
                 }
             }
         }
@@ -54,6 +59,7 @@ struct HomeView: View {
 
     enum NavRoute: Hashable {
         case camera
+        case calibrate
         case settings
         case recalibrate(venueName: String)
     }
@@ -164,7 +170,7 @@ struct HomeView: View {
                 .padding(.top, 12)
 
             PrimaryButton("Set up your first court →") {
-                path.append(.camera)
+                path.append(.calibrate)
             }
             .padding(.top, 22)
 
