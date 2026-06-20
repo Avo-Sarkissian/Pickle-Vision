@@ -134,20 +134,17 @@ struct CalibrationWizardView: View {
                 .font(PVFont.body)
         }
         .sheet(isPresented: $model.showCustomDims) {
-            // TODO (Task 4): CustomDimensionsSheet
-            Text("Custom Dimensions")
-                .font(PVFont.screenTitle)
-                .foregroundStyle(PVColor.onDark)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(PVColor.panel.ignoresSafeArea())
+            CustomDimensionsSheet(
+                customDimensions: $model.flow.customDimensions,
+                layout: $model.flow.layout,
+                onApply: { model.showCustomDims = false }
+            )
         }
         .sheet(isPresented: $model.showUltraWide) {
-            // TODO (Task 4): UltraWideFallbackCard
-            Text("Ultra-wide Fallback")
-                .font(PVFont.screenTitle)
-                .foregroundStyle(PVColor.onDark)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(PVColor.panel.ignoresSafeArea())
+            UltraWideFallbackCard(
+                onSwitch: { model.showUltraWide = false },
+                onKeep: { model.showUltraWide = false }
+            )
         }
     }
 
