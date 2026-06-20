@@ -52,6 +52,8 @@ struct HomeView: View {
                     // live camera), so Save dismisses back here to Home and the
                     // newly-saved court appears in the list (onAppear reloads).
                     CalibrationScreen(camera: CameraService())
+                case .clips:
+                    HistoryView()
                 case .session(let id):
                     if let cal = store.load(id: id), let model = CalibrationStore.courtModel(from: cal) {
                         CameraScreen(profile: profileStore.profile, court: model, courtName: cal.venueName, courtID: cal.id)
@@ -68,6 +70,7 @@ struct HomeView: View {
         case camera
         case calibrate
         case settings
+        case clips
         case recalibrate(id: UUID)
         case session(id: UUID)
     }
@@ -88,6 +91,15 @@ struct HomeView: View {
                     .foregroundStyle(PVColor.ink)
             }
             Spacer()
+            Button {
+                path.append(.clips)
+            } label: {
+                Image(systemName: "film")
+                    .font(PVFont.ui(18))
+                    .foregroundStyle(PVColor.mutedLight)
+                    .frame(width: 44, height: 44, alignment: .topTrailing)
+            }
+            .buttonStyle(.plain)
             Button {
                 path.append(.settings)
             } label: {
