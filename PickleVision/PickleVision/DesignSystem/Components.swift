@@ -17,7 +17,7 @@ struct InstrumentPill: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            if let systemImage { Image(systemName: systemImage).font(.system(size: 10, weight: .semibold)) }
+            if let systemImage { Image(systemName: systemImage).font(PVFont.mono(10, weight: .semibold)) }
             Text(text).font(PVFont.mono(11, weight: .medium)).tracking(0.6)
         }
         .foregroundStyle(tint)
