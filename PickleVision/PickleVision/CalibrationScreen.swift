@@ -46,6 +46,7 @@ struct CalibrationScreen: View {
         }
         .navigationTitle("Calibrate")
         .navigationBarTitleDisplayMode(.inline)
+        .lockOrientation(.landscape)
         .onAppear { camera.start(); freeze() }
         .onChange(of: corners) { tapResult = nil }
         .onChange(of: layout) { tapResult = nil }

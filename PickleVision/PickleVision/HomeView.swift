@@ -18,6 +18,7 @@ struct HomeView: View {
                 .buttonStyle(.borderedProminent)
             }
             .padding()
+            .lockOrientation(.portrait)
         }
     }
 }

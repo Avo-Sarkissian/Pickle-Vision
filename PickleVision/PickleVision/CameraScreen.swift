@@ -20,6 +20,7 @@ struct CameraScreen: View {
         }
         .navigationTitle("Camera")
         .navigationBarTitleDisplayMode(.inline)
+        .lockOrientation(.landscape)
         // Note: we intentionally do NOT stop the session on disappear — pushing
         // the Calibration screen reuses the same session (and its frame feed).
         .onAppear { camera.start() }
