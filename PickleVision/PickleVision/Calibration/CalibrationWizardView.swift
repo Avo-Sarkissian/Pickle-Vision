@@ -28,13 +28,14 @@ import PickleVisionCore
     init(camera: CameraService,
          flow: CalibrationFlow = CalibrationFlow(),
          venueName: String = "My Court",
-         editingID: UUID? = nil) {
+         editingID: UUID? = nil,
+         storeDirectory: URL? = nil) {
         self.camera = camera
         self.flow = flow
         self.venueName = venueName
         self.calibrationID = editingID ?? UUID()
         self.store = CalibrationStore(
-            directory: URL.documentsDirectory.appendingPathComponent("calibrations")
+            directory: storeDirectory ?? URL.documentsDirectory.appendingPathComponent("calibrations")
         )
     }
 
