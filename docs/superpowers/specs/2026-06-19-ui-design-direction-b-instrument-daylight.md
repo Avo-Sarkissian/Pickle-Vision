@@ -7,6 +7,8 @@
 
 ---
 
+**Canonical design reference (in-repo):** `docs/design/handoff-instrument-daylight.md` (full token table + per-screen data bindings, high-fidelity) and the 10 board renders in `docs/design/screenshots/`. This spec is the engineering layer over that handoff — invariants, open decisions, repo corrections, and the build backlog.
+
 ## 1. Principle
 
 **Precise like an instrument. Legible in full sun.** This is an outdoor, one-handed, on-device tool that makes line calls. Two surfaces with opposite needs:
@@ -36,34 +38,34 @@ Implemented via a `UIApplicationDelegate.supportedInterfaceOrientationsFor` driv
 
 ## 4. Palette
 
-**Revised in the 2nd design pass:** the instrument accent moved from cyan to **optic-yellow** (highest legibility on dark video in full sun), and the court overlay is **zone-colored** — blue in-bounds, green apron. Approximate tokens (tune to the design file's exact values):
+**Exact tokens — canonical source is `docs/design/handoff-instrument-daylight.md`** (full table there). The instrument accent is **optic-yellow** (never blue/green, so the overlay always contrasts the real court). Key values:
 
 **Light · menus**
-- `paper` — warm off-white background `~#E8E7E1`
-- `ink` — near-black text/surfaces `~#15181C`
-- `in` — blue, in-bounds zone `~#3B6FE0`
-- `out` — green, apron / out-of-bounds zone `~#3FBF5F`
-- primary action — **optic-yellow** `~#D4F23A` (Start a session, Apply, Continue anyway…)
-- destructive — red, reserved for Delete only `~#E8472B`
+- `paper` — light bg `#f4f5f3` (cards `#ffffff`, hairline `#e8ebe9`)
+- `ink` — primary text / text on yellow `#14181b`
+- `in` — in-bounds blue `#4d9bff` (call/text), swatch `#2f63c2`
+- `out` — out-of-bounds green `#46c46a`
+- primary action — **optic-yellow `#e6f53a`** (ink text on it); destructive red `#e5402a` (Delete)
+- muted text `#5e6a70` / `#7a848a` / `#8a949a`
 
 **Dark · video overlay**
-- `feed` — near-black video letterbox `~#0A0E12`
-- `panel` — overlay card fill `~#0E1620` (optic-yellow hairline border)
-- `overlay` — **optic-yellow** computed instrument lines / handles / primary `~#D4F23A`
-- `warn` — amber, thermal / drift / caution `~#E9A93A`
-- court zones — in-bounds **blue**, apron **green** (the computed lines themselves stay optic-yellow)
+- `feed` — live-video stand-in gradient `linear-gradient(176deg,#13343a,#0e2228,#0a1418)` (real = `AVCaptureVideoPreviewLayer`)
+- `panel` / chrome — `#0c1216` / `#101920` / `#17242b`; rail bg `#101920`; borders `#1e2a31` / `#25333a`; pills `rgba(8,14,17,0.82)`
+- `overlay` — **optic-yellow `#e6f53a`** computed lines / handles / loupe ring / primary
+- `warn` — amber `#f4b53a` (also `#e08a16`) thermal / drift / NVZ / incomplete checks
+- court zones — in-bounds **blue** (fill `rgba(61,134,245,0.06–0.16)`), apron **green**; text on dark `#eaf6f9` / `#dbe8ff`
 
-Semantic use: optic-yellow = computed/active, blue = in-bounds zone, green = apron/out zone, amber = caution (thermal, drift, "raise mount"), red = destructive only. Color is never the only signal — always paired with text (IN/OUT, COOLING…).
+Semantic use: optic-yellow = computed/active, blue = in-bounds, green = apron/out, amber = caution, red = record/destructive. Color is never the only signal — always paired with text (IN/OUT, COOLING…).
 
 **OPEN DECISION — IN/OUT verdict color (resolve before Phase 2).** Phase-2 call badges currently read IN=blue / OUT=green to match the spatial zones. Internally consistent, but inverts the strong cultural prior (green=in / red=out; Hawk-Eye shows OUT red) — a green "OUT" can misread at a glance. Lean: keep blue/green for the spatial court overlay, but give the verdict badge a judgment palette (OUT in amber or red). Not blocking now (Phase 2 element).
 
 ## 5. Type
 
-- **Saira** — display / headlines ("Ready to ref.", "Precise like an instrument")
-- **Manrope** — UI / body
-- **IBM Plex Mono** — data readouts, labels, coordinates (`1080p · 120fps`, `x 0.2 · y 12.6 ft`)
+- **SF Pro Display** — display / titles / scoreboard (bold/heavy, tight tracking ~-0.01em)
+- **SF Pro Text** — UI / body
+- **SF Mono** — data readouts / labels (uppercase labels, letter-spacing 0.1–0.18em)
 
-Three bundled fonts is a real setup task (§8). Acceptable v1 fallback: SF Pro (display/UI) + SF Mono (data) to ship the layout before fonts land.
+**SF Pro / SF Mono are the shipping fonts** (handoff §Typography). The HTML board renders Saira / Manrope / IBM Plex Mono for flavor, but the native app ships SF unless we later choose to bundle the custom faces — so font bundling is **optional polish, not on the critical path**. Sizes (pt ≈ px in the mock): hero 44, section H2 28, screen title 20–28, body 13–14, data/labels 9–11 (mono). Keep overlay text ≥ ~11 pt, readable at arm's length.
 
 ## 6. Screens
 
@@ -107,9 +109,10 @@ Runtime: `CALLS PAUSED` pill + "Mount moved — re-aligning" card, "The court no
 ## 8. Implied implementation backlog (design promises that need real work)
 
 - **Per-screen orientation controller** (this session) — replace app-global lock.
-- **Bundle fonts** (Saira / Manrope / Plex Mono) or SF fallback for v1.
-- **`CourtModel` signed distance-to-nearest-line** — backs the tap-test "± in".
-- **Per-zone confidence model** — from homography reprojection residual / mount geometry; gate behind §2.1 (omit until real).
+- **Fonts:** ship **SF Pro / SF Mono** (no work). Bundling Saira / Manrope / Plex Mono is optional polish, not required.
+- **Fit-quality indicator (v1):** single qualitative "Good/Fair" + 4-seg bar from the homography reprojection residual — show in Fine-tune/Save now.
+- **`CourtModel` signed distance-to-nearest-line (Phase 2)** — backs the tap-test "± in".
+- **Per-zone ±in confidence (Phase 2)** — needs on-court measurement; omit until real (per §2.1).
 - **Position-check sensing** — CoreMotion (steady) + CV/geometry (whole-court, mount height); advisory only.
 - **Auto-detect (Plan 3.5)** with confidence % + manual fallback.
 - **Express re-calibrate path** — Home re-cal icon jumps a saved court straight to Fine-tune (skip position/detect).
@@ -119,6 +122,12 @@ Runtime: `CALLS PAUSED` pill + "Mount moved — re-aligning" card, "The court no
 ## 8a. Verified against the repo (2026-06-20)
 
 The 2nd design pass's layout numbers were checked against `CourtProfile`/`CustomDimensions` and **match**: regulation pickleball **20×44 · NVZ 7**, tennis front-box **27×42 · NVZ 7**, custom = user `CustomDimensions(widthFeet, lengthFeet, nonVolleyZoneFeet)` (Custom card's Width / Length / Kitchen (NVZ)). The Home saved-court dims and the "Court layouts" atom are accurate, not decorative. The honest-confidence and never-hard-block fixes are fully reflected (numbers quarantined to a "Phase 2 · aspirational" row; Continue-anyway / Calibrate-manually / auto-detect-fail states all present).
+
+**Handoff corrections (verified in code) — these override the handoff doc where they conflict:**
+- **Drift guard uses `DriftDetector`** (`DriftState` + `evaluate(translation:rotationRadians:)`) — the handoff's "reuse `StabilityCheck`" names a type that **does not exist** in the repo.
+- `ThermalRecommendation` confirmed: `shouldWarn` / `frameRateCap: Double?` / `message: String?`.
+- **No 4K240 on iPhone 16 Pro** (main lens: 4K ≤120, 1080p ≤240). Settings must not offer 4K·240; `ThermalPolicy` overrides the effective cap.
+- **Fit-quality is a v1 element, not deferred:** show a single qualitative "Good/Fair" + 4-segment bar derived from the **homography reprojection residual** (computable today) in Fine-tune/Save. Only per-zone ±in and detect % are Phase 2.
 
 ## 9. Phase tagging (what's real now vs later)
 

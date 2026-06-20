@@ -26,3 +26,7 @@ Carthage/Build/
 
 # Superpowers brainstorm visual companion (local only)
 .superpowers/
+
+# Design handoff raw export (durable parts live in docs/design/)
+/design-export/
+Pickle Vision app interface.zip
