@@ -35,7 +35,7 @@
 
 ## STATUS
 
-`SETTING UP` — caffeinate holding the Mac awake; writing this doc; about to expand the plans.
+`PHASE 1 — building Plan 5 (Design System)`, then Plans 6 → 7 → 8, then engine plans 3.5/4. Phase 0 complete: Plans 5–8 expanded to bite-sized executable specs by 4 planner subagents (committed `0c3de49`) — ~26 tasks total. Executing sequentially (implementer → reviewer per task; builds serialized for correctness, no human in the loop).
 
 ## Live progress log
 
@@ -43,7 +43,14 @@
 
 ## Decisions log
 
-- (decisions will be appended here as they're made)
+- **On `main`, no worktree:** the build toolchain (`xcodebuild`/Xcode MCP) is pointed at the repo; a worktree would break it. Building on `main` is the established project mechanic. (controller)
+- **Plan 5 `CourtOverlay`:** all court lines stroke optic-yellow; blue/green are zone *fills* only (in-bounds / apron). Kept `CourtOverlayView` as a thin wrapper so the existing calibration call-site keeps compiling. (planner-5)
+- **Added core API (NOT new data models):** `CalibrationStore.loadAll()` + `delete(venueName:)` for the saved-courts list; `CameraService.start(profile:)` for capture-profile selection. (planner-6)
+- **`CaptureProfile`** = auto / uhd120 / fhd240 / fhd120 / batterySaver; recommended = uhd120, default = fhd120; **no uhd240** (iPhone 16 Pro lens limit). (planner-6)
+- **Auto-detect stub = `.failed → manual`** (never fabricate a `.found`) — honors honesty + never-block; the real engine is Plan 3.5. (planner-8)
+- **FitQuality** from the homography reprojection residual in normalized [0,1] space; residual value never shown (qualitative Good/Fair + 0–4 bar only). (planner-8)
+- **Fixed latent bug:** the old single-screen `save()` dropped custom dimensions (`customDimensions: nil`); the wizard persists them. (planner-8)
+- **History screen** has no nav entry in the handoff → built but `#Preview`-only for now; decide where it hangs in the morning. (planner-6)
 
 ## Device-verification PUNCH-LIST (do these in the morning on the iPhone 16 Pro)
 
