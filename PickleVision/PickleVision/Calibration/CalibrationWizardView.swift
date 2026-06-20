@@ -112,6 +112,7 @@ import PickleVisionCore
 /// wiring, orientation lock, and sheets are all live.
 struct CalibrationWizardView: View {
     @ObservedObject var model: CalibrationModel
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         GeometryReader { _ in
@@ -178,11 +179,26 @@ struct CalibrationWizardView: View {
                     AutoDetectCanvasOverlay(model: model)
                 }
 
-                // Status pill — "FROZEN FRAME" on fineTune + verify
-                if model.flow.step == .fineTune || model.flow.step == .verify {
+                // Tap-test canvas overlay (verify step only)
+                if model.flow.step == .verify {
+                    VerifyCanvasOverlay(model: model)
+                }
+
+                // Status pill — "FROZEN FRAME" on fineTune; "TAP TO TEST THE MAP" on verify
+                if model.flow.step == .fineTune {
                     VStack {
                         HStack {
                             InstrumentPill("FROZEN FRAME", tint: PVColor.optic)
+                                .padding(12)
+                            Spacer()
+                        }
+                        Spacer()
+                    }
+                }
+                if model.flow.step == .verify {
+                    VStack {
+                        HStack {
+                            InstrumentPill("TAP TO TEST THE MAP", tint: PVColor.optic)
                                 .padding(12)
                             Spacer()
                         }
@@ -241,8 +257,7 @@ struct CalibrationWizardView: View {
         case .fineTune:
             FineTuneStepView(model: model)
         case .verify:
-            // TODO (Task 7): VerifyStepView(model: model)
-            StubStepView(label: "VERIFY", stepNumber: 4)
+            VerifyStepView(model: model, onSaved: { dismiss() })
         }
     }
 }
