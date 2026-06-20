@@ -21,9 +21,12 @@ import PickleVisionCore
     private let store: CalibrationStore
     private var freezeSink: AnyCancellable?
 
-    init(camera: CameraService, flow: CalibrationFlow = CalibrationFlow()) {
+    init(camera: CameraService,
+         flow: CalibrationFlow = CalibrationFlow(),
+         venueName: String = "My Court") {
         self.camera = camera
         self.flow = flow
+        self.venueName = venueName
         self.store = CalibrationStore(
             directory: URL.documentsDirectory.appendingPathComponent("calibrations")
         )
