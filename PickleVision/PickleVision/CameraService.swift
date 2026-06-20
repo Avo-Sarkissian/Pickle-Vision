@@ -8,7 +8,7 @@ import PickleVisionCore
 /// session queue (off the main thread, per AVFoundation guidance); all
 /// `@Published` UI state is published back on the main thread.
 final class CameraService: NSObject, ObservableObject {
-    enum PermissionState { case unknown, authorized, denied }
+    enum PermissionState { case unknown, authorized, denied, restricted }
 
     @Published private(set) var permission: PermissionState = .unknown
     @Published private(set) var isRunning = false
@@ -35,8 +35,14 @@ final class CameraService: NSObject, ObservableObject {
     private var chosenMaxRate: Double = 120
     private var frameTimes: [CFTimeInterval] = []   // touched only on frameQueue
     private var lastPublishedFPS = 0                // touched only on frameQueue
-    private var frameCounter = 0                    // touched only on frameQueue
+    private var snapshotEnabled = false             // touched only on frameQueue; gates frozen-frame capture
     private let ciContext = CIContext()
+    private var thermalPaused = false               // touched only on sessionQueue
+    private var interruptionObservers: [NSObjectProtocol] = []
+
+    deinit {
+        interruptionObservers.forEach { NotificationCenter.default.removeObserver($0) }
+    }
 
     /// Starts capture using the format selector implied by `profile`. `.auto`
     /// keeps the existing 1080p·120 baseline (ThermalPolicy then adapts down).
@@ -57,6 +63,10 @@ final class CameraService: NSObject, ObservableObject {
                 self.setPermission(granted ? .authorized : .denied)
                 if granted { self.configureAndStart() }
             }
+        case .restricted:
+            // Parental controls / MDM: the user can't grant this in Settings, so
+            // the UI must say so rather than offer a useless "Open Settings".
+            setPermission(.restricted)
         default:
             setPermission(.denied)
         }
@@ -68,6 +78,21 @@ final class CameraService: NSObject, ObservableObject {
             if session.isRunning { session.stopRunning() }
             self.publishOnMain { self.isRunning = false }
         }
+    }
+
+    // MARK: - Frozen-frame capture (M8: only produce CGImages when asked)
+
+    /// Asks the frame pipeline to emit one fresh `latestImage`. Clears any stale
+    /// frame so the calibration freeze waits for a new one.
+    func requestFrozenFrame() {
+        publishOnMain { self.latestImage = nil }
+        frameQueue.async { [weak self] in self?.snapshotEnabled = true }
+    }
+
+    /// Stops producing `latestImage` once the freeze has its frame, so the live
+    /// camera isn't churning full-resolution CGImages no one reads.
+    func endFrozenFrameRequest() {
+        frameQueue.async { [weak self] in self?.snapshotEnabled = false }
     }
 
     // MARK: - Configuration (session queue)
@@ -137,7 +162,9 @@ final class CameraService: NSObject, ObservableObject {
         }
         if let best = selector.select(from: mapped.map(\.1)),
            let chosen = mapped.first(where: { $0.1 == best })?.0 {
-            let rate = min(best.maxFrameRate, 120)
+            // Honor the selected profile's cap (e.g. 240 for 1080p·240) rather than
+            // a hard-coded 120; ThermalPolicy still steps it down under heat.
+            let rate = min(best.maxFrameRate, selector.maxFrameRate)
             chosenMaxRate = rate
             if (try? device.lockForConfiguration()) != nil {
                 device.activeFormat = chosen
@@ -158,6 +185,30 @@ final class CameraService: NSObject, ObservableObject {
 
         session.commitConfiguration()
         observePressure(on: device)
+        addInterruptionObservers()
+    }
+
+    /// Tracks session interruptions (phone call, another app taking the camera,
+    /// being backgrounded) so `isRunning` reflects reality and capture resumes
+    /// when the interruption ends.
+    private func addInterruptionObservers() {
+        guard interruptionObservers.isEmpty else { return }
+        let nc = NotificationCenter.default
+        interruptionObservers.append(
+            nc.addObserver(forName: AVCaptureSession.wasInterruptedNotification, object: session, queue: .main) { [weak self] _ in
+                self?.isRunning = false
+            }
+        )
+        interruptionObservers.append(
+            nc.addObserver(forName: AVCaptureSession.interruptionEndedNotification, object: session, queue: .main) { [weak self] _ in
+                guard let self else { return }
+                self.sessionQueue.async {
+                    if !self.session.isRunning { self.session.startRunning() }
+                    let running = self.session.isRunning
+                    self.publishOnMain { self.isRunning = running }
+                }
+            }
+        )
     }
 
     private func observePressure(on device: AVCaptureDevice) {
@@ -169,10 +220,32 @@ final class CameraService: NSObject, ObservableObject {
         }
     }
 
-    /// Re-applies the active frame duration if thermal pressure capped the rate.
+    /// Re-applies the active frame duration if thermal pressure capped the rate,
+    /// and actually pauses/resumes capture at the shutdown level.
     private func applyThermalCap(_ cap: Double?) {
         sessionQueue.async { [weak self] in
-            guard let self, let device = self.device else { return }
+            guard let self else { return }
+
+            // Shutdown reports cap == 0 ("pause capture"). Actually stop the
+            // session so reality matches the "capture paused" banner — otherwise
+            // it kept running at full rate at the hottest moment.
+            if let cap, cap == 0 {
+                if self.session.isRunning { self.session.stopRunning() }
+                self.thermalPaused = true
+                self.publishOnMain { self.isRunning = false }
+                return
+            }
+
+            guard let device = self.device else { return }
+
+            // Pressure eased after a thermal pause — resume capture.
+            if self.thermalPaused {
+                self.thermalPaused = false
+                if !self.session.isRunning { self.session.startRunning() }
+                let running = self.session.isRunning
+                self.publishOnMain { self.isRunning = running }
+            }
+
             let target: Double
             if let cap, cap > 0 { target = min(cap, self.chosenMaxRate) }
             else { target = self.chosenMaxRate }
@@ -221,9 +294,9 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
             publishOnMain { self.measuredFPS = fps }
         }
 
-        // Throttled frozen-frame snapshot for calibration (every ~10th frame).
-        frameCounter += 1
-        if frameCounter % 10 == 0, let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+        // Frozen-frame snapshot — only while a calibration freeze is requested,
+        // so the live camera doesn't build full-resolution CGImages no one reads.
+        if snapshotEnabled, let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
             let ci = CIImage(cvPixelBuffer: pixelBuffer)
             let size = CGSize(width: CVPixelBufferGetWidth(pixelBuffer),
                               height: CVPixelBufferGetHeight(pixelBuffer))

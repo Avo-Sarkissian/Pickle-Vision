@@ -72,6 +72,7 @@ private struct DecorativeCourtGuide: View {
 
 struct CameraScreen: View {
     @StateObject private var camera = CameraService()
+    @Environment(\.scenePhase) private var scenePhase
     @State private var recStart: Date = .now
     @State private var goCalibrate = false
 
@@ -105,7 +106,9 @@ struct CameraScreen: View {
                     CalibrationScreen(camera: camera)
                 }
             case .denied:
-                permissionDenied
+                permissionBlocked(restricted: false)
+            case .restricted:
+                permissionBlocked(restricted: true)
             case .unknown:
                 PVColor.feedGradient.ignoresSafeArea()
                 ProgressView().tint(PVColor.optic)
@@ -119,6 +122,15 @@ struct CameraScreen: View {
         .onAppear {
             recStart = .now
             camera.start(profile: profile)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Stop capture while backgrounded (battery + thermal); restart on
+            // return — which also re-checks permission if it was granted in Settings.
+            switch phase {
+            case .active:     camera.start(profile: profile)
+            case .background: camera.stop()
+            default:          break
+            }
         }
     }
 
@@ -175,26 +187,31 @@ struct CameraScreen: View {
         }
     }
 
-    // MARK: - Permission Denied
+    // MARK: - Permission Blocked (denied or restricted)
 
-    private var permissionDenied: some View {
+    private func permissionBlocked(restricted: Bool) -> some View {
         ZStack {
             PVColor.feedGradient.ignoresSafeArea()   // dark feed-stand-in background
             VStack(spacing: 16) {
                 Image(systemName: "camera.metering.unknown")
                     .font(PVFont.display(44, weight: .regular))
                     .foregroundStyle(PVColor.optic)
-                Text("Camera access is off")
+                Text(restricted ? "Camera access is restricted" : "Camera access is off")
                     .font(PVFont.screenTitle)
                     .foregroundStyle(PVColor.onDark)
-                Text("Pickle Vision needs the camera to see the court. Everything stays on this device.")
+                Text(restricted
+                     ? "Camera access is blocked by Screen Time or a device-management profile, so it can't be turned on here. Everything stays on this device."
+                     : "Pickle Vision needs the camera to see the court. Everything stays on this device.")
                     .font(PVFont.body)
                     .foregroundStyle(PVColor.onDark.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 420)
-                PrimaryButton("Open Settings") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
+                // Settings can't fix a restricted (managed) device, so only offer it when denied.
+                if !restricted {
+                    PrimaryButton("Open Settings") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
                     }
                 }
             }

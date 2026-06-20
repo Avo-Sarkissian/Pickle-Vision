@@ -177,7 +177,7 @@ private struct GhostCourtTrapezoid: View {
 
 // MARK: - Preview
 
-#Preview("DriftGuardOverlay — landscape") {
+#Preview("DriftGuardOverlay — landscape", traits: .landscapeLeft) {
     ZStack {
         // Stand-in for the live camera feed
         PVColor.feedGradient
@@ -188,7 +188,6 @@ private struct GhostCourtTrapezoid: View {
             onDismiss: { print("Dismiss tapped") }
         )
     }
-    .previewInterfaceOrientation(.landscapeLeft)
     // NOTE: This component is intentionally unreachable from the running app until
     // the Plan 4 DriftDetector engine wires it at runtime. The #Preview is the
     // primary verification surface during development.

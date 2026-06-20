@@ -44,11 +44,9 @@ import PickleVisionCore
     /// immediately. Otherwise subscribes to the first frame that arrives.
     /// (Preserves "capture first frame on freeze" behavior.)
     func freeze() {
-        if let img = camera.latestImage {
-            frozen = img
-            frozenSize = camera.imageSize
-            return
-        }
+        // Ask the camera to emit one fresh frame (it doesn't snapshot otherwise),
+        // then capture the first one that arrives.
+        camera.requestFrozenFrame()
         freezeSink = camera.$latestImage
             .compactMap { $0 }
             .first()
@@ -57,6 +55,7 @@ import PickleVisionCore
                 guard let self else { return }
                 self.frozen = img
                 self.frozenSize = self.camera.imageSize
+                self.camera.endFrozenFrameRequest()
                 self.freezeSink = nil
             }
     }
@@ -126,6 +125,7 @@ import PickleVisionCore
 struct CalibrationWizardView: View {
     @ObservedObject var model: CalibrationModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         GeometryReader { _ in
@@ -139,6 +139,14 @@ struct CalibrationWizardView: View {
         .onAppear {
             model.camera.start()
             model.freeze()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Don't keep the camera running while backgrounded (battery + thermal).
+            switch phase {
+            case .active:     model.camera.start()
+            case .background: model.camera.stop()
+            default:          break
+            }
         }
         .alert("Couldn't save calibration", isPresented: model.saveErrorBinding) {
             Button("OK", role: .cancel) {}
