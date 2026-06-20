@@ -73,16 +73,17 @@ struct CourtOverlay: View {
 }
 
 #Preview("CourtOverlay") {
-    // Build a CourtModel: map the 4 court corners to 4 image corners → homography.
+    // Production stores NORMALIZED [0,1] image corners; mirror that here so the
+    // preview renders the same way the app does. Order: [nearLeft, nearRight,
+    // farRight, farLeft] — near (wide) at the bottom, far (narrow) at the top.
     let profile = CourtProfile.make(layout: .regulationPickleball)
-    let imageSize = CGSize(width: 1280, height: 720)
+    let imageSize = CGSize(width: 1280, height: 720)   // frame aspect for the mapper
     let imgCorners = [
-        CGPoint(x: 360, y: 200),   // nearLeft
-        CGPoint(x: 920, y: 200),   // nearRight
-        CGPoint(x: 1120, y: 620),  // farRight
-        CGPoint(x: 160, y: 620),   // farLeft
+        CGPoint(x: 0.18, y: 0.82),   // nearLeft
+        CGPoint(x: 0.82, y: 0.82),   // nearRight
+        CGPoint(x: 0.64, y: 0.30),   // farRight
+        CGPoint(x: 0.36, y: 0.30),   // farLeft
     ]
-    // CourtProfile.calibrationCorners order is [nearLeft, nearRight, farRight, farLeft].
     let model: CourtModel? = Homography(source: imgCorners, destination: profile.calibrationCorners)
         .map { CourtModel(profile: profile, homography: $0) }
 
@@ -94,4 +95,5 @@ struct CourtOverlay: View {
             Text("homography failed").foregroundStyle(.red)
         }
     }
+    .frame(width: 560, height: 315)   // landscape, like the live camera
 }

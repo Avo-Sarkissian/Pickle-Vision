@@ -10,6 +10,9 @@ struct CalibrationView: View {
 
     @State private var dragging: Int? = nil
     @State private var dragLocation: CGPoint = .zero
+    /// Offset from the touch point to the grabbed handle, captured on the first
+    /// change, so the corner moves with the finger instead of teleporting to it.
+    @State private var grabOffset: CGSize = .zero
 
     /// Short labels (kept for reference; full names used for active handle only)
     private let shortLabels = ["NL", "NR", "FR", "FL"]
@@ -80,11 +83,19 @@ struct CalibrationView: View {
             .onChanged { value in
                 if dragging == nil {
                     let draft = CalibrationDraft(layout: .regulationPickleball)
-                    dragging = draft.nearestCornerIndex(toView: value.startLocation, handles: handles, within: 44)
+                    if let i = draft.nearestCornerIndex(toView: value.startLocation, handles: handles, within: 44) {
+                        dragging = i
+                        // Grab where the user touched relative to the handle, so the
+                        // first move nudges the corner instead of snapping it to the finger.
+                        grabOffset = CGSize(width: handles[i].x - value.startLocation.x,
+                                            height: handles[i].y - value.startLocation.y)
+                    }
                 }
                 if let i = dragging {
-                    dragLocation = value.location
-                    corners[i] = clampNormalized(mapper.imageNormalized(fromView: value.location))
+                    let adjusted = CGPoint(x: value.location.x + grabOffset.width,
+                                           y: value.location.y + grabOffset.height)
+                    dragLocation = adjusted
+                    corners[i] = clampNormalized(mapper.imageNormalized(fromView: adjusted))
                 }
             }
             .onEnded { _ in dragging = nil }

@@ -77,13 +77,22 @@ struct SavedCourtCard: View {
 /// Dark mini-tile rendering the saved court's outline via the Plan 5 CourtOverlay.
 private struct CourtThumbnail: View {
     let calibration: StoredCalibration
+    private let model: CourtModel?
+    private let contentSize: CGSize
+
+    init(calibration: StoredCalibration) {
+        self.calibration = calibration
+        // Build the homography once per card, not on every body re-render.
+        self.model = CalibrationStore.courtModel(from: calibration)
+        self.contentSize = Self.imageSize(for: calibration)
+    }
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).fill(PVColor.panel)
-            if let model = courtModel {
+            if let model {
                 CourtOverlay(model: model,
-                             imageSize: imageSize(calibration),
+                             imageSize: contentSize,
                              lineWidth: 1.2,
                              opacity: 1.0)
             }
@@ -91,15 +100,9 @@ private struct CourtThumbnail: View {
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
-    private var courtModel: CourtModel? {
-        let store = CalibrationStore(directory: URL.documentsDirectory
-            .appendingPathComponent("calibrations"))
-        return store.courtModel(from: calibration)
-    }
-
-    // Thumbnail draws in image space; use the corners' bounding box as the
-    // content size so the overlay's AspectFillMapper frames the court.
-    private func imageSize(_ cal: StoredCalibration) -> CGSize {
+    // Stored corners are normalized [0,1]; the bounding box (floored at 1) keeps
+    // the overlay's AspectFillMapper in normalized space.
+    private static func imageSize(for cal: StoredCalibration) -> CGSize {
         let xs = cal.imageCorners.map(\.x)
         let ys = cal.imageCorners.map(\.y)
         let w = max((xs.max() ?? 1) - (xs.min() ?? 0), 1)
@@ -115,11 +118,11 @@ private struct CourtThumbnail: View {
         calibration: StoredCalibration(
             venueName: "Riverside · Court 3",
             layout: .regulationPickleball,
-            imageCorners: [
-                CodablePoint(x: 45,  y: 172),
-                CodablePoint(x: 275, y: 172),
-                CodablePoint(x: 200, y: 48),
-                CodablePoint(x: 120, y: 48),
+            imageCorners: [          // normalized [0,1], like production
+                CodablePoint(x: 0.16, y: 0.80),
+                CodablePoint(x: 0.84, y: 0.80),
+                CodablePoint(x: 0.66, y: 0.30),
+                CodablePoint(x: 0.34, y: 0.30),
             ],
             customDimensions: nil,
             savedAt: Date().addingTimeInterval(-2 * 86_400)
@@ -135,11 +138,11 @@ private struct CourtThumbnail: View {
         calibration: StoredCalibration(
             venueName: "Brighton Athletic · Court 1",
             layout: .tennisFrontBox,
-            imageCorners: [
-                CodablePoint(x: 60,  y: 200),
-                CodablePoint(x: 320, y: 200),
-                CodablePoint(x: 260, y: 50),
-                CodablePoint(x: 120, y: 50),
+            imageCorners: [          // normalized [0,1], like production
+                CodablePoint(x: 0.18, y: 0.82),
+                CodablePoint(x: 0.82, y: 0.82),
+                CodablePoint(x: 0.64, y: 0.28),
+                CodablePoint(x: 0.36, y: 0.28),
             ],
             customDimensions: nil,
             savedAt: Date().addingTimeInterval(-5 * 3_600)
@@ -155,11 +158,11 @@ private struct CourtThumbnail: View {
         calibration: StoredCalibration(
             venueName: "Backyard Setup",
             layout: .custom,
-            imageCorners: [
-                CodablePoint(x: 80,  y: 180),
-                CodablePoint(x: 300, y: 180),
-                CodablePoint(x: 240, y: 60),
-                CodablePoint(x: 140, y: 60),
+            imageCorners: [          // normalized [0,1], like production
+                CodablePoint(x: 0.20, y: 0.78),
+                CodablePoint(x: 0.80, y: 0.78),
+                CodablePoint(x: 0.62, y: 0.32),
+                CodablePoint(x: 0.38, y: 0.32),
             ],
             customDimensions: CustomDimensions(
                 widthFeet: 18,

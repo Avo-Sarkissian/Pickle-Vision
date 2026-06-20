@@ -159,8 +159,9 @@ public final class CalibrationStore {
     }
 
     /// Recomputes a live `CourtModel` from a stored calibration, or `nil` if the
-    /// corners are missing/degenerate.
-    public func courtModel(from calibration: StoredCalibration) -> CourtModel? {
+    /// corners are missing/degenerate. Uses no instance state — exposed statically
+    /// so views can build it once without standing up a store.
+    public static func courtModel(from calibration: StoredCalibration) -> CourtModel? {
         guard calibration.imageCorners.count == 4 else { return nil }
         let profile = CourtProfile.make(layout: calibration.layout,
                                         custom: calibration.customDimensions)
@@ -169,5 +170,9 @@ public final class CalibrationStore {
             return nil
         }
         return CourtModel(profile: profile, homography: h)
+    }
+
+    public func courtModel(from calibration: StoredCalibration) -> CourtModel? {
+        Self.courtModel(from: calibration)
     }
 }

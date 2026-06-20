@@ -21,6 +21,9 @@ struct CustomDimensionsSheet: View {
     @State private var validLength: Double = 40.0
     @State private var validKitchen: Double = 7.0
 
+    // Inline validation feedback (e.g. kitchen too large for the length)
+    @State private var note: String?
+
     var body: some View {
         ZStack {
             PVColor.panel.ignoresSafeArea()
@@ -77,6 +80,15 @@ struct CustomDimensionsSheet: View {
                                 }
                             )
                         }
+                    }
+
+                    // Inline validation note
+                    if let note {
+                        Text(note)
+                            .font(PVFont.mono(11, weight: .regular))
+                            .foregroundStyle(PVColor.amber)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
                     // Apply button
@@ -147,8 +159,22 @@ struct CustomDimensionsSheet: View {
         // Validate all fields before applying; fall back to last valid on garbage
         let w = Double(widthText).flatMap { $0 > 0 ? $0 : nil } ?? validWidth
         let l = Double(lengthText).flatMap { $0 > 0 ? $0 : nil } ?? validLength
-        let k = Double(kitchenText).flatMap { $0 > 0 ? $0 : nil } ?? validKitchen
+        var k = Double(kitchenText).flatMap { $0 > 0 ? $0 : nil } ?? validKitchen
 
+        // The kitchen must fit inside one half of the court, otherwise the NVZ
+        // lines fall outside the court rectangle. Clamp and tell the user rather
+        // than producing (and saving) a self-inconsistent court.
+        let maxKitchen = l / 2
+        if k >= maxKitchen {
+            k = max(0.5, maxKitchen - 0.5)
+            validWidth = w; validLength = l; validKitchen = k
+            kitchenText = formatted(k)
+            note = "Kitchen must be under half the length (\(formatted(maxKitchen)) ft). Adjusted to \(formatted(k)) ft — tap Apply to confirm."
+            return   // stay open so the adjustment is visible
+        }
+
+        note = nil
+        validWidth = w; validLength = l; validKitchen = k
         customDimensions = CustomDimensions(widthFeet: w, lengthFeet: l, nonVolleyZoneFeet: k)
         layout = .custom
         onApply()

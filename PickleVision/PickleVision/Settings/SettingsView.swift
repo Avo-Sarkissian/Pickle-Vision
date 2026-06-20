@@ -191,8 +191,8 @@ struct SettingsView: View {
             venueName: "Riverside · Court 3",
             layout: .regulationPickleball,
             imageCorners: [
-                CodablePoint(x: 45, y: 172), CodablePoint(x: 275, y: 172),
-                CodablePoint(x: 200, y: 48),  CodablePoint(x: 120, y: 48),
+                CodablePoint(x: 0.16, y: 0.80), CodablePoint(x: 0.84, y: 0.80),
+                CodablePoint(x: 0.66, y: 0.30), CodablePoint(x: 0.34, y: 0.30),
             ],
             customDimensions: nil,
             savedAt: Date().addingTimeInterval(-2 * 86_400)
@@ -201,8 +201,8 @@ struct SettingsView: View {
             venueName: "Brighton Athletic · Court 1",
             layout: .tennisFrontBox,
             imageCorners: [
-                CodablePoint(x: 60, y: 200), CodablePoint(x: 320, y: 200),
-                CodablePoint(x: 260, y: 50),  CodablePoint(x: 120, y: 50),
+                CodablePoint(x: 0.18, y: 0.82), CodablePoint(x: 0.82, y: 0.82),
+                CodablePoint(x: 0.64, y: 0.28), CodablePoint(x: 0.36, y: 0.28),
             ],
             customDimensions: nil,
             savedAt: Date().addingTimeInterval(-5 * 3_600)
