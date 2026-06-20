@@ -85,7 +85,7 @@ struct CameraScreen: View {
         ZStack {
             switch camera.permission {
             case .authorized:
-                CameraPreviewView(session: camera.session)
+                CameraPreviewView(camera: camera)
                     .ignoresSafeArea()
                 // Faint decorative court guide — static, pre-calibration, behind chrome.
                 DecorativeCourtGuide()

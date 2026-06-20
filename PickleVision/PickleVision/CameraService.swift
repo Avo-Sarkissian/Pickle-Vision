@@ -27,7 +27,11 @@ final class CameraService: NSObject, ObservableObject {
     private let thermalPolicy = ThermalPolicy(baseFrameRate: 120)
 
     private var device: AVCaptureDevice?
+    /// Exposed read-only so the preview can attach a rotation coordinator.
+    var captureDevice: AVCaptureDevice? { device }
     private var pressureObservation: NSKeyValueObservation?
+    private var captureRotation: AVCaptureDevice.RotationCoordinator?
+    private var captureRotationObservation: NSKeyValueObservation?
     private var chosenMaxRate: Double = 120
     private var frameTimes: [CFTimeInterval] = []   // touched only on frameQueue
     private var lastPublishedFPS = 0                // touched only on frameQueue
@@ -74,7 +78,35 @@ final class CameraService: NSObject, ObservableObject {
             self.configureSession()
             if !self.session.isRunning { self.session.startRunning() }
             let running = self.session.isRunning
-            self.publishOnMain { self.isRunning = running }
+            let device = self.device
+            self.publishOnMain {
+                self.isRunning = running
+                if let device { self.setupCaptureRotation(device: device) }
+            }
+        }
+    }
+
+    // MARK: - Rotation (frozen-frame capture)
+
+    /// Keeps the video-output connection horizon-level so the frozen calibration
+    /// frame is upright and matches the live preview. Created on the main thread;
+    /// the connection mutation runs on the session queue.
+    private func setupCaptureRotation(device: AVCaptureDevice) {
+        guard captureRotation == nil else { return }
+        let rc = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: nil)
+        captureRotation = rc
+        applyCaptureAngle(rc.videoRotationAngleForHorizonLevelCapture)
+        captureRotationObservation = rc.observe(\.videoRotationAngleForHorizonLevelCapture, options: [.new]) { [weak self] coord, _ in
+            self?.applyCaptureAngle(coord.videoRotationAngleForHorizonLevelCapture)
+        }
+    }
+
+    private func applyCaptureAngle(_ angle: CGFloat) {
+        sessionQueue.async { [weak self] in
+            guard let self,
+                  let connection = self.videoOutput.connection(with: .video),
+                  connection.isVideoRotationAngleSupported(angle) else { return }
+            connection.videoRotationAngle = angle
         }
     }
 
