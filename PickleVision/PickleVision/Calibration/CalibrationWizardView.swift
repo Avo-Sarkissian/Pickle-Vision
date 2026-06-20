@@ -185,7 +185,7 @@ struct CalibrationWizardView: View {
                     }
                 }
 
-                // Status pill — camera info on position step
+                // Status pill + framing overlay — camera info + guide on position step
                 if model.flow.step == .position {
                     VStack {
                         HStack {
@@ -199,6 +199,7 @@ struct CalibrationWizardView: View {
                         }
                         Spacer()
                     }
+                    PositionCanvasOverlay()
                 }
 
             } else {
@@ -229,8 +230,7 @@ struct CalibrationWizardView: View {
     private var stepView: some View {
         switch model.flow.step {
         case .position:
-            // TODO (Task 4): PositionStepView(model: model)
-            StubStepView(label: "POSITION", stepNumber: 1)
+            PositionStepView(model: model)
         case .detect:
             // TODO (Task 5): AutoDetectStepView(model: model)
             StubStepView(label: "AUTO DETECT", stepNumber: 2)
