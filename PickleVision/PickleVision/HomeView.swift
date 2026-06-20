@@ -54,7 +54,7 @@ struct HomeView: View {
                     CalibrationScreen(camera: CameraService())
                 case .session(let id):
                     if let cal = store.load(id: id), let model = CalibrationStore.courtModel(from: cal) {
-                        CameraScreen(profile: profileStore.profile, court: model, courtName: cal.venueName)
+                        CameraScreen(profile: profileStore.profile, court: model, courtName: cal.venueName, courtID: cal.id)
                     } else {
                         // Court unreadable: fall back to a generic session.
                         CameraScreen(profile: profileStore.profile)

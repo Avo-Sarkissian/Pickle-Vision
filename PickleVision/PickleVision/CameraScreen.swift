@@ -73,17 +73,20 @@ private struct DecorativeCourtGuide: View {
 struct CameraScreen: View {
     @StateObject private var camera = CameraService()
     @Environment(\.scenePhase) private var scenePhase
-    @State private var recStart: Date = .now
+    /// Set to the recording-start Date when recording begins; nil when idle.
+    @State private var recStart: Date? = nil
     @State private var goCalibrate = false
 
     private let profile: CaptureProfile
     private let court: CourtModel?
     private let courtName: String?
+    private let courtID: UUID?
 
-    init(profile: CaptureProfile = .auto, court: CourtModel? = nil, courtName: String? = nil) {
+    init(profile: CaptureProfile = .auto, court: CourtModel? = nil, courtName: String? = nil, courtID: UUID? = nil) {
         self.profile = profile
         self.court = court
         self.courtName = courtName
+        self.courtID = courtID
     }
 
     var body: some View {
@@ -129,8 +132,11 @@ struct CameraScreen: View {
         // Note: we intentionally do NOT stop the session on disappear — pushing
         // the Calibration screen reuses the same session (and its frame feed).
         .onAppear {
-            recStart = .now
             camera.start(profile: profile)
+        }
+        .onChange(of: camera.isRecording) { _, isNowRecording in
+            // Capture start time when recording begins; clear it when recording stops.
+            recStart = isNowRecording ? .now : nil
         }
         .onChange(of: scenePhase) { _, phase in
             // Stop capture while backgrounded (battery + thermal); restart on
@@ -166,13 +172,23 @@ struct CameraScreen: View {
         }
     }
 
-    /// Bottom row: score placeholder (left), slo-mo placeholder + Calibrate button (right).
+    /// Bottom row: score placeholder (left), record toggle + slo-mo placeholder + Calibrate button (right).
     private var bottomRow: some View {
         HStack(alignment: .bottom) {
             DashedPlaceholder("6 / 3 · SCORE · PHASE 6")
                 .allowsHitTesting(false)
             Spacer()
             HStack(spacing: 10) {
+                Button {
+                    if camera.isRecording { camera.stopRecording() }
+                    else if let courtID { camera.startRecording(courtID: courtID) }
+                } label: {
+                    Image(systemName: camera.isRecording ? "stop.circle.fill" : "record.circle")
+                        .font(PVFont.display(34))
+                        .foregroundStyle(camera.isRecording ? PVColor.recordRed : PVColor.onDark)
+                }
+                .disabled(courtID == nil)   // generic court-less session cannot record a bound clip
+                .accessibilityLabel(camera.isRecording ? "Stop recording" : "Start recording")
                 DashedPlaceholder("SLO-MO REPLAY")
                     .allowsHitTesting(false)
                 PrimaryButton("Calibrate", systemImage: "scope") {
@@ -183,13 +199,24 @@ struct CameraScreen: View {
     }
 
     /// Top-left instrument cluster — REC readout + live format + live fps.
+    /// REC elapsed only counts while `camera.isRecording`; idle shows "--:--".
     private var topLeftCluster: some View {
         HStack(spacing: 8) {
-            TimelineView(.periodic(from: recStart, by: 1)) { context in
-                let elapsed = Int(context.date.timeIntervalSince(recStart))
+            if let start = recStart {
+                // Recording active: drive elapsed from the captured start time.
+                TimelineView(.periodic(from: start, by: 1)) { context in
+                    let elapsed = Int(context.date.timeIntervalSince(start))
+                    StatusReadout(
+                        label: "REC",
+                        value: String(format: "%d:%02d", elapsed / 60, elapsed % 60),
+                        dotColor: PVColor.recordRed
+                    )
+                }
+            } else {
+                // Idle: show placeholder so the HUD item stays in place.
                 StatusReadout(
                     label: "REC",
-                    value: String(format: "%d:%02d", elapsed / 60, elapsed % 60),
+                    value: "--:--",
                     dotColor: PVColor.recordRed
                 )
             }
