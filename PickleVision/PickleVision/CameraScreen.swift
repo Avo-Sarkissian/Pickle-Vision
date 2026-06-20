@@ -4,6 +4,7 @@ import PickleVisionCore
 struct CameraScreen: View {
     @StateObject private var camera = CameraService()
     @State private var recStart: Date = .now
+    @State private var goCalibrate = false
 
     private let profile: CaptureProfile
 
@@ -20,18 +21,13 @@ struct CameraScreen: View {
                 VStack {
                     topRow
                     Spacer()
-                    NavigationLink {
-                        CalibrationScreen(camera: camera)
-                    } label: {
-                        Label("Calibrate court", systemImage: "scope")
-                            .font(PVFont.ui(14, weight: .semibold))
-                            .padding(.horizontal, 16).padding(.vertical, 10)
-                            .background(.ultraThinMaterial, in: Capsule())
-                    }
-                    .padding(.bottom, 30)
+                    bottomRow
                 }
                 .padding(16)
                 .ignoresSafeArea(.container, edges: .horizontal)
+                .navigationDestination(isPresented: $goCalibrate) {
+                    CalibrationScreen(camera: camera)
+                }
             case .denied:
                 permissionDenied
             case .unknown:
@@ -52,12 +48,31 @@ struct CameraScreen: View {
 
     // MARK: - HUD
 
-    /// Top row: left cluster (REC + format + fps) and right cluster (thermal, conditional).
+    /// Top row: left cluster (REC + format + fps), center Phase-2 placeholder, right cluster (thermal).
     private var topRow: some View {
         HStack(alignment: .top) {
             topLeftCluster
             Spacer(minLength: 12)
+            DashedPlaceholder("IN / OUT CALLS · PHASE 2")
+                .allowsHitTesting(false)
+            Spacer(minLength: 12)
             thermalCluster
+        }
+    }
+
+    /// Bottom row: score placeholder (left), slo-mo placeholder + Calibrate button (right).
+    private var bottomRow: some View {
+        HStack(alignment: .bottom) {
+            DashedPlaceholder("6 / 3 · SCORE · PHASE 6")
+                .allowsHitTesting(false)
+            Spacer()
+            HStack(spacing: 10) {
+                DashedPlaceholder("SLO-MO REPLAY")
+                    .allowsHitTesting(false)
+                PrimaryButton("Calibrate", systemImage: "scope") {
+                    goCalibrate = true
+                }
+            }
         }
     }
 
