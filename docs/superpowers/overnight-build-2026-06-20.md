@@ -35,7 +35,7 @@
 
 ## STATUS
 
-`PHASE 1 — building Plan 5 (Design System)`, then Plans 6 → 7 → 8, then engine plans 3.5/4. Phase 0 complete: Plans 5–8 expanded to bite-sized executable specs by 4 planner subagents (committed `0c3de49`) — ~26 tasks total. Executing sequentially (implementer → reviewer per task; builds serialized for correctness, no human in the loop).
+`PHASE 2 — Plans 5 & 6 COMPLETE; building Plan 7 (Camera/Live)`, then Plan 8 (calibration wizard), then engine plans 3.5/4. Each task: implementer subagent → reviewer subagent → fix loop → commit+push, build 0 warnings. Done: **Plan 5 Design System** (PVColor, PVFont, 7 instrument atoms, zone-colored CourtOverlay) + **Plan 6 Menus** (CaptureProfile + store, Home populated + empty, SavedCourtCard, Settings w/ profile-select + manage-courts, History placeholder, nav fully wired incl. express re-cal). 13 tasks, all build clean, on `main`.
 
 ## Live progress log
 
@@ -54,7 +54,14 @@
 
 ## Device-verification PUNCH-LIST (do these in the morning on the iPhone 16 Pro)
 
-- [ ] (to be filled as screens land — each will name the screenshot to compare against)
+**Plan 6 — Menus (compare on device, portrait):**
+- [ ] Home **populated** vs `docs/design/screenshots/01-home.png` (header/hero/Start/saved-court cards/footer).
+- [ ] Home **empty / first-launch** vs `02-home-empty.png` ("First court." + "No saved courts yet").
+- [ ] **Settings** vs `03-settings.png` (capture-profile select + RECOMMENDED/DEFAULT pills + manage-courts Delete).
+- [ ] **Nav works:** gear→Settings, Start a session→Camera, saved-court ↻→re-calibrate (seeds the court), Set-up-first-court→Camera, Delete removes a court.
+- [ ] **Portrait↔landscape flips:** menus stay portrait; pushing Camera/Calibrate rotates to landscape; backing out returns to portrait (the one thing I couldn't verify — watch this).
+- [ ] History screen: ghost cards currently use a dark panel on the light screen — may want a lighter surface (visual taste); also History has no nav entry yet (decide where it hangs).
+- [ ] Home footer capsule uses `paper` (subtle) vs the brief's `panel` — confirm which reads better.
 
 ## Build/test state at hand-off
 
