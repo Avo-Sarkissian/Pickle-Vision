@@ -20,9 +20,15 @@ final class CameraService: NSObject, ObservableObject {
 
     let session = AVCaptureSession()
 
+    @Published private(set) var isRecording = false
+    @Published var lastSavedClip: SessionClip?
+
     private let sessionQueue = DispatchQueue(label: "vision.pickle.session")
     private let frameQueue = DispatchQueue(label: "vision.pickle.frames")
     private let videoOutput = AVCaptureVideoDataOutput()
+    private let movieOutput = AVCaptureMovieFileOutput()
+    private var recordingCourtID: UUID?
+    private let clipStore = ClipStore(directory: URL.documentsDirectory.appendingPathComponent("clips"))
     private var selector = CameraFormatSelector(targetHeight: 1080, maxFrameRate: 120)
     private let thermalPolicy = ThermalPolicy(baseFrameRate: 120)
 
@@ -183,6 +189,12 @@ final class CameraService: NSObject, ObservableObject {
             session.addOutput(videoOutput)
         }
 
+        // AVCaptureMovieFileOutput and a high-fps AVCaptureVideoDataOutput can coexist,
+        // but sustained 4K/120 recording is large and hot. For personal use this is
+        // acceptable; revisit if thermals bite (see CONSIDERATIONS.md).
+        // Note: no audio input is added, so no microphone permission is required.
+        if session.canAddOutput(movieOutput) { session.addOutput(movieOutput) }
+
         session.commitConfiguration()
         observePressure(on: device)
         addInterruptionObservers()
@@ -268,6 +280,27 @@ final class CameraService: NSObject, ObservableObject {
         }
     }
 
+    // MARK: - Clip recording
+
+    func startRecording(courtID: UUID) {
+        sessionQueue.async { [weak self] in
+            guard let self, !self.movieOutput.isRecording else { return }
+            self.recordingCourtID = courtID
+            let name = "\(UUID().uuidString).mov"
+            let url = URL.documentsDirectory.appendingPathComponent("clips").appendingPathComponent(name)
+            try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            self.movieOutput.startRecording(to: url, recordingDelegate: self)
+            self.publishOnMain { self.isRecording = true }
+        }
+    }
+
+    func stopRecording() {
+        sessionQueue.async { [weak self] in
+            guard let self, self.movieOutput.isRecording else { return }
+            self.movieOutput.stopRecording()
+        }
+    }
+
     // MARK: - Main-thread publishing
 
     private func setPermission(_ state: PermissionState) {
@@ -307,5 +340,21 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
                 }
             }
         }
+    }
+}
+
+extension CameraService: AVCaptureFileOutputRecordingDelegate {
+    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL,
+                    from connections: [AVCaptureConnection], error: Error?) {
+        let courtID = recordingCourtID ?? UUID()
+        let size = imageSize
+        let fps = Double(chosenMaxRate)
+        publishOnMain { self.isRecording = false }
+        guard error == nil else { return }   // dismissable failure: just leave isRecording false
+        let clip = SessionClip(courtID: courtID, fileName: outputFileURL.lastPathComponent,
+                               fps: fps, frameWidth: size.width, frameHeight: size.height,
+                               recordedAt: Date())
+        try? clipStore.save(clip)
+        publishOnMain { self.lastSavedClip = clip }
     }
 }
