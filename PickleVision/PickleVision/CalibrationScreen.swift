@@ -9,6 +9,25 @@ struct CalibrationScreen: View {
     @ObservedObject var camera: CameraService
     @Environment(\.dismiss) private var dismiss
 
+    // MARK: - Inits
+
+    /// Camera-launched path: the caller owns and starts the CameraService.
+    init(camera: CameraService) {
+        _camera = ObservedObject(wrappedValue: camera)
+    }
+
+    /// Express re-calibrate: jump straight onto the fine-tune surface for an
+    /// existing saved court (skips position + auto-detect). Seeds the four
+    /// corners, layout, custom dims, and venue from the stored calibration;
+    /// owns a fresh CameraService for the frozen frame.
+    init(reloading calibration: StoredCalibration) {
+        _camera = ObservedObject(wrappedValue: CameraService())
+        _layout = State(initialValue: calibration.layout)
+        _corners = State(initialValue: calibration.imageCorners.map { $0.cgPoint })
+        _venueName = State(initialValue: calibration.venueName)
+        _showOverlay = State(initialValue: true)   // land showing the saved court
+    }
+
     @State private var frozen: CGImage?
     @State private var frozenSize: CGSize = .zero
     @State private var layout: CourtLayout = .regulationPickleball

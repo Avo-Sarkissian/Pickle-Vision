@@ -4,6 +4,12 @@ import PickleVisionCore
 struct CameraScreen: View {
     @StateObject private var camera = CameraService()
 
+    private let profile: CaptureProfile
+
+    init(profile: CaptureProfile = .auto) {
+        self.profile = profile
+    }
+
     var body: some View {
         ZStack {
             switch camera.permission {
@@ -23,7 +29,7 @@ struct CameraScreen: View {
         .lockOrientation(.landscape)
         // Note: we intentionally do NOT stop the session on disappear — pushing
         // the Calibration screen reuses the same session (and its frame feed).
-        .onAppear { camera.start() }
+        .onAppear { camera.start(profile: profile) }
     }
 
     private var hud: some View {

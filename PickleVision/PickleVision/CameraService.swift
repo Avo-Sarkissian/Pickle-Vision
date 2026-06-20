@@ -23,7 +23,7 @@ final class CameraService: NSObject, ObservableObject {
     private let sessionQueue = DispatchQueue(label: "vision.pickle.session")
     private let frameQueue = DispatchQueue(label: "vision.pickle.frames")
     private let videoOutput = AVCaptureVideoDataOutput()
-    private let selector = CameraFormatSelector(targetHeight: 1080, maxFrameRate: 120)
+    private var selector = CameraFormatSelector(targetHeight: 1080, maxFrameRate: 120)
     private let thermalPolicy = ThermalPolicy(baseFrameRate: 120)
 
     private var device: AVCaptureDevice?
@@ -33,6 +33,13 @@ final class CameraService: NSObject, ObservableObject {
     private var lastPublishedFPS = 0                // touched only on frameQueue
     private var frameCounter = 0                    // touched only on frameQueue
     private let ciContext = CIContext()
+
+    /// Starts capture using the format selector implied by `profile`. `.auto`
+    /// keeps the existing 1080p·120 baseline (ThermalPolicy then adapts down).
+    func start(profile: CaptureProfile) {
+        selector = profile.formatSelector
+        start()
+    }
 
     /// Requests permission if needed, then configures and starts the session.
     func start() {

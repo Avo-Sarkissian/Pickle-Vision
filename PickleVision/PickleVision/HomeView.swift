@@ -30,28 +30,28 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .lockOrientation(.portrait)
             .onAppear { courts = store.loadAll() }
-            // STUB (Task 6.9): CameraScreen(profile:) initializer not yet available —
-            // routing to CameraScreen() without profile param.
             .navigationDestination(for: NavRoute.self) { route in
                 switch route {
                 case .camera:
-                    CameraScreen()              // Task 6.9: replace with CameraScreen(profile: profileStore.profile)
+                    CameraScreen(profile: profileStore.profile)
                 case .settings:
                     SettingsView(
                         profileStore: profileStore,
                         store: store,
                         onChange: { courts = store.loadAll() }
                     )
-                case .recalibrate:
-                    Text("Re-calibrate")        // Task 6.9: replace with CalibrationScreen(reloading:)
-                        .navigationTitle("Re-calibrate")
+                case .recalibrate(let venueName):
+                    if let cal = try? store.load(venueName: venueName) {
+                        CalibrationScreen(reloading: cal)
+                    } else {
+                        // Fallback: venue no longer on disk — start fresh camera path.
+                        CameraScreen(profile: profileStore.profile)
+                    }
                 }
             }
         }
     }
 
-    // STUB (Task 6.9): .recalibrate carries the venue name so the next task
-    // can reconstruct the StoredCalibration from CalibrationStore.
     enum NavRoute: Hashable {
         case camera
         case settings
