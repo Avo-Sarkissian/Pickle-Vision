@@ -84,3 +84,52 @@ enum PVColor {
         Text(name).font(.system(.caption, design: .monospaced))
     }
 }
+
+// MARK: - PVFont
+
+/// Type roles for "Instrument · Daylight".
+/// SF Pro Display/Text (system, .default design) + SF Mono (.monospaced design).
+/// Sizes from docs/design/handoff-instrument-daylight.md §Typography.
+enum PVFont {
+    /// SF Pro Display — titles / hero / scoreboard (bold-heavy, tight tracking).
+    static func display(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
+        .system(size: size, weight: weight, design: .default)
+    }
+    /// SF Pro Text — UI / body.
+    static func ui(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        .system(size: size, weight: weight, design: .default)
+    }
+    /// SF Mono — data readouts / labels.
+    static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        .system(size: size, weight: weight, design: .monospaced)
+    }
+
+    // Named roles (handoff size scale: hero 44 / H2 28 / screen-title 20–28 / body 13–14 / data-label 9–11)
+    static let hero = display(44, weight: .heavy)
+    static let h2 = display(28, weight: .bold)
+    static let screenTitle = display(22, weight: .bold)
+    static let body = ui(14, weight: .regular)
+    static let bodySmall = ui(13, weight: .regular)
+    static let dataLabel = mono(10, weight: .medium)
+    static let dataValue = mono(13, weight: .regular)
+
+    /// Tracking for display titles (handoff: -0.01em → ~-0.5pt at hero size).
+    static let displayTracking: CGFloat = -0.5
+    /// Letter-spacing for uppercase mono labels (handoff: 0.1–0.18em → ~1.4pt at 10pt).
+    static let labelTracking: CGFloat = 1.4
+}
+
+#Preview("PVFont specimen") {
+    VStack(alignment: .leading, spacing: 14) {
+        Text("Ready to ref.").font(PVFont.hero).tracking(PVFont.displayTracking)
+        Text("Section H2").font(PVFont.h2).tracking(PVFont.displayTracking)
+        Text("Screen title").font(PVFont.screenTitle)
+        Text("Body 14 — the quick brown fox").font(PVFont.body)
+        Text("Body small 13").font(PVFont.bodySmall)
+        Text("CAPTURE PROFILE")
+            .font(PVFont.dataLabel).tracking(PVFont.labelTracking)
+            .foregroundStyle(PVColor.mutedLight)
+        Text("1080p · 120fps").font(PVFont.dataValue)
+    }
+    .padding()
+}
