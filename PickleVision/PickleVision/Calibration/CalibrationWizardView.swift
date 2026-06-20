@@ -239,8 +239,7 @@ struct CalibrationWizardView: View {
         case .detect:
             AutoDetectStepView(model: model)
         case .fineTune:
-            // TODO (Task 6): FineTuneStepView(model: model)
-            StubStepView(label: "FINE-TUNE", stepNumber: 3)
+            FineTuneStepView(model: model)
         case .verify:
             // TODO (Task 7): VerifyStepView(model: model)
             StubStepView(label: "VERIFY", stepNumber: 4)

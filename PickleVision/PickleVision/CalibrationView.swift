@@ -11,7 +11,10 @@ struct CalibrationView: View {
     @State private var dragging: Int? = nil
     @State private var dragLocation: CGPoint = .zero
 
-    private let labels = ["NL", "NR", "FR", "FL"]
+    /// Short labels (kept for reference; full names used for active handle only)
+    private let shortLabels = ["NL", "NR", "FR", "FL"]
+    /// Full-name labels shown beside the active (dragging) handle
+    private let fullLabels = ["nearLeft", "nearRight", "farRight", "farLeft"]
 
     var body: some View {
         GeometryReader { geo in
@@ -31,10 +34,10 @@ struct CalibrationView: View {
                     for h in handles.dropFirst() { p.addLine(to: h) }
                     p.closeSubpath()
                 }
-                .stroke(Color.yellow.opacity(0.9), lineWidth: 2)
+                .stroke(PVColor.optic.opacity(0.9), lineWidth: 2)
 
                 ForEach(handles.indices, id: \.self) { i in
-                    handleView(label: labels[i]).position(handles[i])
+                    handleView(index: i, isActive: dragging == i).position(handles[i])
                 }
 
                 if let d = dragging {
@@ -46,11 +49,29 @@ struct CalibrationView: View {
         }
     }
 
-    private func handleView(label: String) -> some View {
+    private func handleView(index: Int, isActive: Bool) -> some View {
         ZStack {
-            Circle().stroke(Color.yellow, lineWidth: 2).frame(width: 28, height: 28)
-            Circle().fill(Color.yellow).frame(width: 6, height: 6)
-            Text(label).font(.system(size: 9, weight: .bold)).foregroundStyle(.yellow).offset(y: 20)
+            // Active halo
+            if isActive {
+                Circle()
+                    .fill(PVColor.optic.opacity(0.3))
+                    .frame(width: 56, height: 56)
+            }
+            // Handle ring
+            Circle()
+                .stroke(PVColor.optic, lineWidth: 2)
+                .frame(width: isActive ? 40 : 28, height: isActive ? 40 : 28)
+            // Center dot
+            Circle()
+                .fill(PVColor.optic)
+                .frame(width: 6, height: 6)
+            // Full-name label (active handle only)
+            if isActive {
+                Text(fullLabels[index])
+                    .font(PVFont.mono(9, weight: .semibold))
+                    .foregroundStyle(PVColor.optic)
+                    .offset(y: 30)
+            }
         }
     }
 
@@ -86,7 +107,7 @@ struct CalibrationView: View {
             .frame(width: loupeSize, height: loupeSize)
             .clipShape(Circle())
             .overlay(Circle().stroke(Color.white, lineWidth: 2))
-            .overlay(Image(systemName: "plus").font(.system(size: 10)).foregroundStyle(.white))
+            .overlay(Image(systemName: "plus").font(PVFont.mono(10)).foregroundStyle(.white))
             .position(x: min(max(location.x, loupeSize), geo.size.width - loupeSize),
                       y: max(location.y - loupeSize, loupeSize))
     }
