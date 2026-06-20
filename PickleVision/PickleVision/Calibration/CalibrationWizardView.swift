@@ -241,8 +241,16 @@ struct CalibrationWizardView: View {
         ZStack {
             PVColor.rail.ignoresSafeArea(edges: .all)
 
-            stepView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // Scrollable so the rail's controls (especially the bottom buttons)
+            // stay reachable when content is taller than the short landscape
+            // rail. `minHeight == available height` keeps buttons bottom-pinned
+            // when the content fits, and lets it scroll when it doesn't.
+            GeometryReader { geo in
+                ScrollView {
+                    stepView
+                        .frame(maxWidth: .infinity, minHeight: geo.size.height)
+                }
+            }
         }
         .frame(width: 204)
     }
