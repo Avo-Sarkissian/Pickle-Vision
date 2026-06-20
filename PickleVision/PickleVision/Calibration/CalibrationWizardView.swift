@@ -173,6 +173,11 @@ struct CalibrationWizardView: View {
                     CourtOverlayView(model: courtModel, imageSize: model.frozenSize)
                 }
 
+                // Auto-detect canvas overlays (scan band / found outline / pill)
+                if model.flow.step == .detect {
+                    AutoDetectCanvasOverlay(model: model)
+                }
+
                 // Status pill — "FROZEN FRAME" on fineTune + verify
                 if model.flow.step == .fineTune || model.flow.step == .verify {
                     VStack {
@@ -232,8 +237,7 @@ struct CalibrationWizardView: View {
         case .position:
             PositionStepView(model: model)
         case .detect:
-            // TODO (Task 5): AutoDetectStepView(model: model)
-            StubStepView(label: "AUTO DETECT", stepNumber: 2)
+            AutoDetectStepView(model: model)
         case .fineTune:
             // TODO (Task 6): FineTuneStepView(model: model)
             StubStepView(label: "FINE-TUNE", stepNumber: 3)
