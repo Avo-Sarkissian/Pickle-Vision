@@ -37,8 +37,11 @@ struct HomeView: View {
                 case .camera:
                     CameraScreen()              // Task 6.9: replace with CameraScreen(profile: profileStore.profile)
                 case .settings:
-                    Text("Settings")            // Task 6.7: replace with SettingsView(…)
-                        .navigationTitle("Settings")
+                    SettingsView(
+                        profileStore: profileStore,
+                        store: store,
+                        onChange: { courts = store.loadAll() }
+                    )
                 case .recalibrate:
                     Text("Re-calibrate")        // Task 6.9: replace with CalibrationScreen(reloading:)
                         .navigationTitle("Re-calibrate")
