@@ -62,4 +62,42 @@ final class CalibrationStoreTests: XCTestCase {
         XCTAssertEqual(origin.y, 0, accuracy: 1e-6)
         XCTAssertEqual(model.profile.layout, .regulationPickleball)
     }
+
+    func test_load_by_id_round_trips() throws {
+        let store = CalibrationStore(directory: dir)
+        let cal = sample()
+        try store.save(cal)
+        let loaded = try XCTUnwrap(store.load(id: cal.id))
+        XCTAssertEqual(loaded, cal)
+    }
+
+    // M5/I4: invalid records are rejected on the way in, before any file is written.
+    func test_save_rejects_wrong_corner_count() {
+        let store = CalibrationStore(directory: dir)
+        var cal = sample()
+        cal.imageCorners = Array(cal.imageCorners.prefix(3))
+        XCTAssertThrowsError(try store.save(cal)) {
+            XCTAssertEqual($0 as? CalibrationStore.StoreError, .invalidCornerCount)
+        }
+    }
+
+    func test_save_rejects_custom_without_dimensions() {
+        let store = CalibrationStore(directory: dir)
+        var cal = sample()
+        cal.layout = .custom
+        cal.customDimensions = nil
+        XCTAssertThrowsError(try store.save(cal)) {
+            XCTAssertEqual($0 as? CalibrationStore.StoreError, .missingCustomDimensions)
+        }
+    }
+
+    func test_save_rejects_invalid_custom_dimensions() {
+        let store = CalibrationStore(directory: dir)
+        var cal = sample()
+        cal.layout = .custom
+        cal.customDimensions = CustomDimensions(widthFeet: 18, lengthFeet: 40, nonVolleyZoneFeet: 25)
+        XCTAssertThrowsError(try store.save(cal)) {
+            XCTAssertEqual($0 as? CalibrationStore.StoreError, .invalidCustomDimensions)
+        }
+    }
 }

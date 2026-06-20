@@ -129,7 +129,7 @@ struct SettingsView: View {
                 .padding(.vertical, 8)
         } else {
             VStack(spacing: 0) {
-                ForEach(Array(courts.enumerated()), id: \.element.venueName) { idx, cal in
+                ForEach(Array(courts.enumerated()), id: \.element.id) { idx, cal in
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(cal.venueName)
@@ -157,7 +157,7 @@ struct SettingsView: View {
     }
 
     private func deleteCourt(_ cal: StoredCalibration) {
-        try? store.delete(venueName: cal.venueName)
+        try? store.delete(id: cal.id)
         courts = store.loadAll()
         onChange()
     }

@@ -19,14 +19,20 @@ import PickleVisionCore
 
     let camera: CameraService
     private let store: CalibrationStore
+    /// Stable identity of the calibration being edited. Re-cal passes the saved
+    /// court's id so Save overwrites the same record even if the name changed
+    /// (no orphaned duplicate); a fresh calibration mints a new id once.
+    private let calibrationID: UUID
     private var freezeSink: AnyCancellable?
 
     init(camera: CameraService,
          flow: CalibrationFlow = CalibrationFlow(),
-         venueName: String = "My Court") {
+         venueName: String = "My Court",
+         editingID: UUID? = nil) {
         self.camera = camera
         self.flow = flow
         self.venueName = venueName
+        self.calibrationID = editingID ?? UUID()
         self.store = CalibrationStore(
             directory: URL.documentsDirectory.appendingPathComponent("calibrations")
         )
@@ -87,6 +93,7 @@ import PickleVisionCore
     func save() -> Bool {
         let trimmed = venueName.trimmingCharacters(in: .whitespacesAndNewlines)
         let cal = StoredCalibration(
+            id: calibrationID,                          // stable identity across re-cal
             venueName: trimmed.isEmpty ? "My Court" : trimmed,
             layout: flow.layout,
             imageCorners: flow.corners.map { CodablePoint($0) },

@@ -36,7 +36,8 @@ struct CalibrationScreen: View {
             _model = StateObject(wrappedValue: CalibrationModel(
                 camera: camera,
                 flow: flow,
-                venueName: stored.venueName
+                venueName: stored.venueName,
+                editingID: stored.id
             ))
         } else {
             _model = StateObject(wrappedValue: CalibrationModel(camera: camera))
@@ -56,7 +57,8 @@ struct CalibrationScreen: View {
         _model = StateObject(wrappedValue: CalibrationModel(
             camera: cam,
             flow: flow,
-            venueName: calibration.venueName
+            venueName: calibration.venueName,
+            editingID: calibration.id
         ))
     }
 

@@ -78,4 +78,44 @@ final class CalibrationStoreLoadAllTests: XCTestCase {
         let all = store.loadAll()
         XCTAssertEqual(all.map(\.venueName), ["Keep"])
     }
+
+    // I1: two courts that share a display name keep distinct ids -> both survive
+    // (the old venue-name-as-filename scheme silently overwrote one).
+    func test_distinct_ids_same_venue_name_both_survive() throws {
+        let store = CalibrationStore(directory: dir)
+        try store.save(cal("My Court", at: 1_000))
+        try store.save(cal("My Court", at: 2_000))
+        XCTAssertEqual(store.loadAll().count, 2)
+    }
+
+    func test_delete_by_id_removes_only_that_court() throws {
+        let store = CalibrationStore(directory: dir)
+        let keep = cal("Keep", at: 2_000)
+        let remove = cal("Remove", at: 1_000)
+        try store.save(keep)
+        try store.save(remove)
+        try store.delete(id: remove.id)
+        XCTAssertEqual(store.loadAll().map(\.venueName), ["Keep"])
+    }
+
+    // A legacy (id-less, venue-named) record migrates to a stable <id>.json file.
+    func test_legacy_file_migrates_to_id_named_file() throws {
+        let store = CalibrationStore(directory: dir)
+        let legacy: [String: Any] = [
+            "venueName": "Legacy Court",
+            "layout": "regulationPickleball",
+            "imageCorners": [["x": 45.0, "y": 172.0], ["x": 275.0, "y": 172.0],
+                             ["x": 200.0, "y": 48.0], ["x": 120.0, "y": 48.0]],
+            "savedAt": Date(timeIntervalSinceReferenceDate: 1_000).timeIntervalSinceReferenceDate,
+        ]
+        let legacyURL = dir.appendingPathComponent("Legacy Court.json")
+        try JSONSerialization.data(withJSONObject: legacy).write(to: legacyURL)
+
+        let all = store.loadAll()
+        XCTAssertEqual(all.count, 1)
+        XCTAssertEqual(all[0].venueName, "Legacy Court")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: legacyURL.path))
+        let migrated = dir.appendingPathComponent("\(all[0].id.uuidString).json")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: migrated.path))
+    }
 }

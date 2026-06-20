@@ -40,11 +40,11 @@ struct HomeView: View {
                         store: store,
                         onChange: { courts = store.loadAll() }
                     )
-                case .recalibrate(let venueName):
-                    if let cal = try? store.load(venueName: venueName) {
+                case .recalibrate(let id):
+                    if let cal = store.load(id: id) {
                         CalibrationScreen(reloading: cal)
                     } else {
-                        // Fallback: venue no longer on disk — start fresh camera path.
+                        // Fallback: court no longer on disk — start fresh camera path.
                         CameraScreen(profile: profileStore.profile)
                     }
                 case .calibrate:
@@ -61,7 +61,7 @@ struct HomeView: View {
         case camera
         case calibrate
         case settings
-        case recalibrate(venueName: String)
+        case recalibrate(id: UUID)
     }
 
     // MARK: Header
@@ -126,9 +126,9 @@ struct HomeView: View {
             .padding(.bottom, 12)
 
             VStack(spacing: 10) {
-                ForEach(courts, id: \.venueName) { cal in
+                ForEach(courts) { cal in
                     SavedCourtCard(calibration: cal) {
-                        path.append(.recalibrate(venueName: cal.venueName))
+                        path.append(.recalibrate(id: cal.id))
                     }
                 }
             }
@@ -435,7 +435,7 @@ struct HomeView: View {
                 .padding(.top, 28)
                 .padding(.bottom, 12)
                 VStack(spacing: 10) {
-                    ForEach(courts, id: \.venueName) { cal in
+                    ForEach(courts) { cal in
                         SavedCourtCard(calibration: cal) {}
                     }
                 }
