@@ -165,6 +165,11 @@ struct CameraScreen: View {
                         .font(PVFont.mono(9))
                         .foregroundStyle(PVColor.onDarkDim)
                         .multilineTextAlignment(.center)
+                } else if court == nil {
+                    Text("Recording works now - add a court map for in/out calls")
+                        .font(PVFont.mono(9))
+                        .foregroundStyle(PVColor.onDarkDim)
+                        .multilineTextAlignment(.center)
                 }
             }
             Spacer(minLength: 12)
@@ -172,30 +177,62 @@ struct CameraScreen: View {
         }
     }
 
-    /// Bottom row: score placeholder (left), record toggle + slo-mo placeholder + Calibrate button (right).
+    /// Bottom bar: the Record button is the centered primary control - always available,
+    /// since a court-less capture is a valid quick clip (record-first flow). Calibrate is
+    /// demoted to a small secondary affordance; the score placeholder stays faint at the edge.
     private var bottomRow: some View {
-        HStack(alignment: .bottom) {
-            DashedPlaceholder("6 / 3 · SCORE · PHASE 6")
-                .allowsHitTesting(false)
-            Spacer()
-            HStack(spacing: 10) {
-                Button {
-                    if camera.isRecording { camera.stopRecording() }
-                    else if let courtID { camera.startRecording(courtID: courtID) }
-                } label: {
-                    Image(systemName: camera.isRecording ? "stop.circle.fill" : "record.circle")
-                        .font(PVFont.display(34))
-                        .foregroundStyle(camera.isRecording ? PVColor.recordRed : PVColor.onDark)
-                }
-                .disabled(courtID == nil)   // generic court-less session cannot record a bound clip
-                .accessibilityLabel(camera.isRecording ? "Stop recording" : "Start recording")
-                DashedPlaceholder("SLO-MO REPLAY")
+        ZStack {
+            recordButton
+            HStack(alignment: .center) {
+                DashedPlaceholder("6 / 3 · SCORE · PHASE 6")
                     .allowsHitTesting(false)
-                PrimaryButton("Calibrate", systemImage: "scope") {
-                    goCalibrate = true
+                Spacer()
+                calibrateButton
+            }
+        }
+    }
+
+    /// Large centered shutter-style record/stop toggle - the primary action of a session.
+    private var recordButton: some View {
+        Button {
+            if camera.isRecording { camera.stopRecording() }
+            else { camera.startRecording(courtID: courtID) }   // courtID may be nil -> quick capture
+        } label: {
+            ZStack {
+                Circle()
+                    .strokeBorder(PVColor.onDark.opacity(0.9), lineWidth: 4)
+                    .frame(width: 70, height: 70)
+                if camera.isRecording {
+                    RoundedRectangle(cornerRadius: 7)
+                        .fill(PVColor.recordRed)
+                        .frame(width: 28, height: 28)
+                } else {
+                    Circle()
+                        .fill(PVColor.recordRed)
+                        .frame(width: 56, height: 56)
                 }
             }
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(camera.isRecording ? "Stop recording" : "Start recording")
+    }
+
+    /// Demoted secondary control: add or refine the court map (only needed for in/out calls).
+    private var calibrateButton: some View {
+        Button { goCalibrate = true } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "scope")
+                Text(court == nil ? "Add court map" : "Re-calibrate")
+            }
+            .font(PVFont.ui(13, weight: .medium))
+            .foregroundStyle(PVColor.onDarkDim)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .background(PVColor.pillFill, in: Capsule())
+            .overlay(Capsule().stroke(PVColor.cardBorder, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(court == nil ? "Add court map" : "Re-calibrate")
     }
 
     /// Top-left instrument cluster - REC readout + live format + live fps.

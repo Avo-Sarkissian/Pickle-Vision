@@ -183,20 +183,37 @@ struct HomeView: View {
 
     private var emptyContent: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("First\ncourt.")
+            Text("Ready to\nref.")
                 .font(PVFont.display(44))
                 .foregroundStyle(PVColor.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("Mount the phone behind the baseline, in landscape, then calibrate the court once.")
+            Text("Mount the phone behind the baseline, in landscape, then hit record. Add a court map any time to turn on in/out calls.")
                 .font(PVFont.ui(14))
                 .foregroundStyle(PVColor.mutedLight)
                 .padding(.top, 12)
 
-            PrimaryButton("Set up your first court →") {
-                path.append(.calibrate)
+            PrimaryButton("Start a session →") {
+                path.append(.camera)
             }
             .padding(.top, 22)
+
+            // Optional, secondary: set up a court map (only needed for in/out calls).
+            Button { path.append(.calibrate) } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "scope")
+                    Text("Set up a court map")
+                    Spacer()
+                }
+                .font(PVFont.ui(14, weight: .medium))
+                .foregroundStyle(PVColor.ink)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 13)
+                .frame(maxWidth: .infinity)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(PVColor.hairline, lineWidth: 1.5))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 10)
 
             Text("SAVED COURTS")
                 .font(PVFont.mono(11, weight: .semibold))
@@ -213,7 +230,7 @@ struct HomeView: View {
                 Text("No saved courts yet")
                     .font(PVFont.ui(15, weight: .semibold))
                     .foregroundStyle(PVColor.ink)
-                Text("Calibrated courts live here - set one up and it's one tap to reload next time.")
+                Text("A court map gives you in/out calls and one-tap reload next time. You can record without one.")
                     .font(PVFont.ui(13))
                     .foregroundStyle(PVColor.mutedLight)
                     .multilineTextAlignment(.center)

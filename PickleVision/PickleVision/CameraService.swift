@@ -285,7 +285,9 @@ final class CameraService: NSObject, ObservableObject {
 
     // MARK: - Clip recording
 
-    func startRecording(courtID: UUID) {
+    /// Starts recording a clip. `courtID` is optional: pass nil for a quick capture
+    /// with no court map yet (record-first flow); the clip is saved unbound.
+    func startRecording(courtID: UUID? = nil) {
         sessionQueue.async { [weak self] in
             guard let self, !self.movieOutput.isRecording else { return }
             self.recordingCourtID = courtID
@@ -354,7 +356,8 @@ extension CameraService: AVCaptureFileOutputRecordingDelegate {
     nonisolated func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL,
                                 from connections: [AVCaptureConnection], error: Error?) {
         // Use nonisolated(unsafe) snapshot properties set on sessionQueue at record-start.
-        let courtID = recordingCourtID ?? UUID()
+        // courtID stays nil for a quick (court-less) capture - do not fabricate one.
+        let courtID = recordingCourtID
         let size = recordingImageSize
         let fps = recordingFPS
         DispatchQueue.main.async { self.isRecording = false }

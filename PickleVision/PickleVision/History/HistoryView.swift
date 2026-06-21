@@ -104,7 +104,8 @@ struct HistoryView: View {
     // MARK: Helpers
 
     private func courtName(for clip: SessionClip) -> String {
-        calStore.load(id: clip.courtID)?.venueName ?? "Unknown court"
+        guard let courtID = clip.courtID else { return "Quick capture - no court map" }
+        return calStore.load(id: courtID)?.venueName ?? "Unknown court"
     }
 
     private func relativeDate(_ date: Date) -> String {
