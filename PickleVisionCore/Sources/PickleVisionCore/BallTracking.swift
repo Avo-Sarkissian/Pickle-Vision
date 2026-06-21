@@ -5,7 +5,8 @@ import Foundation
 
 /// A single ball detection from a vision pass.
 /// Image point is normalized [0,1] to the frame dimensions.
-public struct BallObservation: Equatable {
+/// Codable so trajectory fixtures (Phase B5) can be stored/loaded as JSON.
+public struct BallObservation: Equatable, Codable {
     public var imagePoint: CGPoint
     public var time: TimeInterval
     public var confidence: Double

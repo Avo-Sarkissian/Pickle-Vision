@@ -3,7 +3,7 @@ import CoreGraphics
 // MARK: - LineVerdict
 
 /// The outcome of a line call for a single bounce.
-public enum LineVerdict: Equatable {
+public enum LineVerdict: String, Equatable, Codable {
     /// The ball landed clearly in bounds.
     case `in`
     /// The ball landed clearly out of bounds.
