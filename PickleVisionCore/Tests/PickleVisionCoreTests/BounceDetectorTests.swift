@@ -1,5 +1,6 @@
 import XCTest
 import CoreGraphics
+import Foundation
 @testable import PickleVisionCore
 
 final class BounceDetectorTests: XCTestCase {
@@ -37,5 +38,42 @@ final class BounceDetectorTests: XCTestCase {
     func test_monotonic_motion_has_no_bounce() {
         let obs = (0...5).map { BallObservation(imagePoint: CGPoint(x: 0.2, y: 0.1 + 0.1 * Double($0)), time: Double($0) * 0.1, confidence: 1) }
         XCTAssertTrue(BounceDetector().bounces(in: Tracker().track(obs)).isEmpty)
+    }
+
+    // B5 / B1-M6 coverage: multi-bounce + the prominence threshold boundary.
+
+    func test_detects_two_bounces_in_one_track() {
+        // Two image-y maxima (ball touches ground twice) at t=0.1 and t=0.3, with a single
+        // minimum (apex) between them that must NOT be reported as a bounce.
+        var obs: [BallObservation] = []
+        for i in 0...40 {
+            let t = Double(i) * 0.01
+            let y = 0.6 + 0.2 * cos(2 * Double.pi * (t - 0.1) / 0.2)
+            obs.append(BallObservation(imagePoint: CGPoint(x: 0.5, y: y), time: t, confidence: 1))
+        }
+        let bounces = BounceDetector().bounces(in: Tracker().track(obs))
+        XCTAssertEqual(bounces.count, 2)
+        XCTAssertEqual(bounces[0].time, 0.1, accuracy: 0.03)
+        XCTAssertEqual(bounces[1].time, 0.3, accuracy: 0.03)
+    }
+
+    // A shallow symmetric bump; the window prominence works out to a*0.0024, so
+    // a=5 -> 0.012 (> minProminence 0.01, detected) and a=4 -> 0.0096 (< 0.01, rejected).
+    private func bumpTrack(amplitudeCoeff a: Double) -> BallTrack {
+        var obs: [BallObservation] = []
+        for i in 0...5 {
+            let t = Double(i) * 0.02                       // vertex at t=0.05, between i=2 and i=3
+            let y = 0.5 - a * (t - 0.05) * (t - 0.05)
+            obs.append(BallObservation(imagePoint: CGPoint(x: 0.5, y: y), time: t, confidence: 1))
+        }
+        return Tracker().track(obs)
+    }
+
+    func test_bounce_just_above_min_prominence_is_detected() {
+        XCTAssertEqual(BounceDetector().bounces(in: bumpTrack(amplitudeCoeff: 5)).count, 1)
+    }
+
+    func test_bounce_just_below_min_prominence_is_rejected() {
+        XCTAssertTrue(BounceDetector().bounces(in: bumpTrack(amplitudeCoeff: 4)).isEmpty)
     }
 }

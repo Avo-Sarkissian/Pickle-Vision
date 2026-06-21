@@ -47,16 +47,17 @@ final class LineJudgeTests: XCTestCase {
         XCTAssertEqual(result.courtPoint.y, courtPt.y, accuracy: 1e-6)
     }
 
-    // A bounce that maps to a non-finite court coordinate (near the projective
-    // vanishing line) yields no call.
-    func test_non_finite_court_point_returns_nil() {
+    // A bounce high in the frame maps far past the baseline (a large but FINITE court
+    // coordinate, because a normal court's vanishing line is out of frame -- verified by
+    // the B5 probe). It must be judged OUT, not dropped. The nil-on-non-finite guard in
+    // call() is defensive (for pathological homographies) and is not reachable here.
+    func test_far_toward_horizon_is_called_out_not_dropped() {
         let m = model()
-        // Image point above the far edge can project past the horizon -> non-finite.
         let b = Bounce(imagePoint: CGPoint(x: 0.5, y: 0.05), time: 0, prominence: 1)
         let cp = m.courtPoint(forImage: b.imagePoint)
-        // Only assert the contract when this point is actually non-finite for this quad.
-        if !(cp.x.isFinite && cp.y.isFinite) {
-            XCTAssertNil(LineJudge().call(bounce: b, court: m))
-        }
+        XCTAssertTrue(cp.x.isFinite && cp.y.isFinite, "normal court maps in-frame taps to finite court coords")
+        let result = LineJudge().call(bounce: b, court: m)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.call.verdict, .out)
     }
 }

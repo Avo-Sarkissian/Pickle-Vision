@@ -97,6 +97,18 @@ final class RefereeCoreTests: XCTestCase {
         XCTAssertTrue(result.isEmpty)
     }
 
+    // B5 / B1-M6: a bounce high in the frame maps far past the baseline (a large but finite
+    // court coordinate). RefereeCore must produce exactly one judged bounce, called OUT --
+    // handled cleanly, not dropped and not crashing. (The non-finite drop path is a
+    // defensive guard that a normal court's geometry never triggers; see B5 probe.)
+    func test_evaluate_far_off_court_bounce_is_judged_out() {
+        let m = model()
+        let obs = parabola(peakX: 0.5, peakY: 0.07, t0: 0.0)   // vertex maps to ~ (10, hundreds) ft
+        let result = RefereeCore().evaluate(obs, court: m)
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.call.verdict, .out)
+    }
+
     // Monotonic downward motion (no bounce) produces no judged bounces.
     func test_evaluate_monotonic_motion_returns_empty() {
         let m = model()
