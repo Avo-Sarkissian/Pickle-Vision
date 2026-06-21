@@ -120,7 +120,7 @@ private struct CourtThumbnail: View {
 
 // MARK: - Preview
 
-#Preview("Pickleball — 2 days ago") {
+#Preview("Pickleball - 2 days ago") {
     SavedCourtCard(
         calibration: StoredCalibration(
             venueName: "Riverside · Court 3",
@@ -141,7 +141,7 @@ private struct CourtThumbnail: View {
     .background(PVColor.paper)
 }
 
-#Preview("Tennis box — 5 hours ago") {
+#Preview("Tennis box - 5 hours ago") {
     SavedCourtCard(
         calibration: StoredCalibration(
             venueName: "Brighton Athletic · Court 1",
@@ -162,7 +162,7 @@ private struct CourtThumbnail: View {
     .background(PVColor.paper)
 }
 
-#Preview("Custom court — just now") {
+#Preview("Custom court - just now") {
     SavedCourtCard(
         calibration: StoredCalibration(
             venueName: "Backyard Setup",

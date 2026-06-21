@@ -3,13 +3,13 @@ import PickleVisionCore
 
 // MARK: - FineTuneStepView
 
-/// Step 3 — CALIBRATE / DRAG TO THE LINES.
+/// Step 3 - CALIBRATE / DRAG TO THE LINES.
 /// Occupies the 204pt control rail. The canvas (drag handles + loupe) is
 /// `CalibrationView` rendered by `CalibrationWizardView.canvasArea`.
 ///
 /// Rail contents:
 ///  • "Calibrate" title + "DRAG TO THE LINES" sublabel
-///  • LAYOUT section — SegmentedChips: Pickleball / Tennis box / Custom
+///  • LAYOUT section - SegmentedChips: Pickleball / Tennis box / Custom
 ///  • Court overlay toggle
 ///  • "N / 4 corners set" indicator
 ///  • Re-freeze + Save buttons
@@ -115,7 +115,7 @@ struct FineTuneStepView: View {
 
 // MARK: - Preview
 
-#Preview("FineTuneStepView — rail") {
+#Preview("FineTuneStepView - rail") {
     let camera = CameraService()
     let model  = CalibrationModel(camera: camera, flow: CalibrationFlow(step: .fineTune))
     return ZStack {

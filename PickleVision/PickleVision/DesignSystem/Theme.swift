@@ -36,7 +36,7 @@ enum PVColor {
     static let onDarkDim = hex(0x9fb4bd)    // dim text on dark
     static let monoLabel = hex(0x5f8595)    // mono labels on dark
 
-    // Court zone fills (low-alpha — rgba(61,134,245,0.06–0.16))
+    // Court zone fills (low-alpha - rgba(61,134,245,0.06–0.16))
     static let inBoundsFill = Color(red: 61/255, green: 134/255, blue: 245/255, opacity: 0.14)
     static let outBoundsFill = Color(red: 70/255, green: 196/255, blue: 106/255, opacity: 0.10)
 
@@ -91,15 +91,15 @@ enum PVColor {
 /// SF Pro Display/Text (system, .default design) + SF Mono (.monospaced design).
 /// Sizes from docs/design/handoff-instrument-daylight.md §Typography.
 enum PVFont {
-    /// SF Pro Display — titles / hero / scoreboard (bold-heavy, tight tracking).
+    /// SF Pro Display - titles / hero / scoreboard (bold-heavy, tight tracking).
     static func display(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
         .system(size: size, weight: weight, design: .default)
     }
-    /// SF Pro Text — UI / body.
+    /// SF Pro Text - UI / body.
     static func ui(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         .system(size: size, weight: weight, design: .default)
     }
-    /// SF Mono — data readouts / labels.
+    /// SF Mono - data readouts / labels.
     static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         .system(size: size, weight: weight, design: .monospaced)
     }
@@ -124,7 +124,7 @@ enum PVFont {
         Text("Ready to ref.").font(PVFont.hero).tracking(PVFont.displayTracking)
         Text("Section H2").font(PVFont.h2).tracking(PVFont.displayTracking)
         Text("Screen title").font(PVFont.screenTitle)
-        Text("Body 14 — the quick brown fox").font(PVFont.body)
+        Text("Body 14 - the quick brown fox").font(PVFont.body)
         Text("Body small 13").font(PVFont.bodySmall)
         Text("CAPTURE PROFILE")
             .font(PVFont.dataLabel).tracking(PVFont.labelTracking)

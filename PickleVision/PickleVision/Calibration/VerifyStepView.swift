@@ -3,7 +3,7 @@ import PickleVisionCore
 
 // MARK: - VerifyStepView
 
-/// Step 4 — SAVE COURT.
+/// Step 4 - SAVE COURT.
 /// Occupies the 204pt control rail.
 ///
 /// Canvas overlays (tap-catcher + readout dot + "TAP TO TEST THE MAP" pill) are
@@ -13,7 +13,7 @@ import PickleVisionCore
 /// Rail contents:
 ///  • "Save court" title + "STORED ON DEVICE" sublabel
 ///  • VENUE NAME label + TextField
-///  • FIT QUALITY PVCard — qualitative label + 4-segment bar + corners count + note
+///  • FIT QUALITY PVCard - qualitative label + 4-segment bar + corners count + note
 ///  • Back / Save court buttons
 struct VerifyStepView: View {
     @ObservedObject var model: CalibrationModel
@@ -162,7 +162,7 @@ struct VerifyCanvasOverlay: View {
                     let dotSize: CGFloat = 10
                     let cardOffsetY: CGFloat = -36
 
-                    // Marker dot — non-interactive so re-taps fall through to the catcher.
+                    // Marker dot - non-interactive so re-taps fall through to the catcher.
                     Circle()
                         .fill(result.inBounds ? PVColor.inBounds : PVColor.outBounds)
                         .frame(width: dotSize, height: dotSize)
@@ -170,7 +170,7 @@ struct VerifyCanvasOverlay: View {
                         .position(viewPt)
                         .allowsHitTesting(false)
 
-                    // Readout card — non-interactive so re-taps near the last point register.
+                    // Readout card - non-interactive so re-taps near the last point register.
                     TapReadoutCard(
                         coords: result.coords,
                         inBounds: result.inBounds
@@ -217,7 +217,7 @@ private struct TapReadoutCard: View {
 
 // MARK: - Preview
 
-#Preview("VerifyStepView — rail") {
+#Preview("VerifyStepView - rail") {
     let camera = CameraService()
     let model  = CalibrationModel(camera: camera, flow: CalibrationFlow(step: .verify))
     return ZStack {

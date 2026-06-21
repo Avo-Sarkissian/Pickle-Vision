@@ -4,21 +4,21 @@ import SwiftUI
 
 /// Camera-screen overlay shown when the mount has shifted and calls are paused.
 ///
-/// This is a **UI component only** — it accepts callbacks and renders the
+/// This is a **UI component only** - it accepts callbacks and renders the
 /// "CALLS PAUSED" + re-aligning modal state. It does NOT sense drift or wire to
 /// `DriftDetector`/`StabilityCheck`; that runtime wiring is intentionally deferred
 /// to the Plan 4 engine. Wire `onReTap` / `onDismiss` at the call-site once the
 /// engine is ready.
 ///
 /// The ghost-court trapezoid behind the modal is decorative/static (no real
-/// `CourtModel`) — it represents a drifted court position for visual context.
+/// `CourtModel`) - it represents a drifted court position for visual context.
 ///
 /// Framed for landscape (tripod-mounted iPhone, full-bleed camera feed beneath).
 struct DriftGuardOverlay: View {
-    /// Called when the user taps "Re-tap court" — caller should navigate to
+    /// Called when the user taps "Re-tap court" - caller should navigate to
     /// manual calibration step 3 (fine-tune).
     let onReTap: () -> Void
-    /// Called when the user taps "Dismiss" — caller should hide this overlay
+    /// Called when the user taps "Dismiss" - caller should hide this overlay
     /// and resume whatever partial state is appropriate.
     let onDismiss: () -> Void
 
@@ -31,10 +31,10 @@ struct DriftGuardOverlay: View {
             // 2. Ghost drifted-court trapezoid (decorative, static, amber dashed)
             GhostCourtTrapezoid()
 
-            // 3. Modal card — centered
+            // 3. Modal card - centered
             modalCard
         }
-        // CALLS PAUSED pill — top-left, over everything
+        // CALLS PAUSED pill - top-left, over everything
         .overlay(alignment: .topLeading) {
             callsPausedPill
                 .padding(.top, 16)
@@ -75,7 +75,7 @@ struct DriftGuardOverlay: View {
                 .padding(.bottom, 18)
 
             // Title
-            Text("Mount moved — re-aligning")
+            Text("Mount moved - re-aligning")
                 .font(PVFont.screenTitle)
                 .tracking(PVFont.displayTracking)
                 .foregroundStyle(PVColor.onDark)
@@ -93,7 +93,7 @@ struct DriftGuardOverlay: View {
 
             // Buttons
             HStack(spacing: 10) {
-                // Re-tap court — amber prominent (primary action for this warning state)
+                // Re-tap court - amber prominent (primary action for this warning state)
                 Button(action: onReTap) {
                     Text("Re-tap court")
                         .font(PVFont.ui(15, weight: .semibold))
@@ -104,7 +104,7 @@ struct DriftGuardOverlay: View {
                 }
                 .buttonStyle(.plain)
 
-                // Dismiss — secondary
+                // Dismiss - secondary
                 Button(action: onDismiss) {
                     Text("Dismiss")
                         .font(PVFont.ui(15, weight: .medium))
@@ -140,7 +140,7 @@ struct DriftGuardOverlay: View {
 // MARK: - GhostCourtTrapezoid
 
 /// A static amber dashed trapezoid representing a drifted court position.
-/// Purely decorative — conveys visually that the saved court map no longer
+/// Purely decorative - conveys visually that the saved court map no longer
 /// aligns with the live feed. Uses vector `Path` (no raster, no CourtModel).
 private struct GhostCourtTrapezoid: View {
     var body: some View {
@@ -177,7 +177,7 @@ private struct GhostCourtTrapezoid: View {
 
 // MARK: - Preview
 
-#Preview("DriftGuardOverlay — landscape", traits: .landscapeLeft) {
+#Preview("DriftGuardOverlay - landscape", traits: .landscapeLeft) {
     ZStack {
         // Stand-in for the live camera feed
         PVColor.feedGradient

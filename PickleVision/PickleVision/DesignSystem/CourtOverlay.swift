@@ -4,7 +4,7 @@ import PickleVisionCore
 /// Reusable zone-colored court overlay.
 /// In-bounds = blue fill (low alpha); apron = green fill; all lines = optic-yellow
 /// (per handoff: the overlay never draws blue/green LINES so it contrasts the real court).
-/// Vector only — Path/Shape, never raster.
+/// Vector only - Path/Shape, never raster.
 struct CourtOverlay: View {
     let model: CourtModel
     let imageSize: CGSize
@@ -75,7 +75,7 @@ struct CourtOverlay: View {
 #Preview("CourtOverlay") {
     // Production stores NORMALIZED [0,1] image corners; mirror that here so the
     // preview renders the same way the app does. Order: [nearLeft, nearRight,
-    // farRight, farLeft] — near (wide) at the bottom, far (narrow) at the top.
+    // farRight, farLeft] - near (wide) at the bottom, far (narrow) at the top.
     let profile = CourtProfile.make(layout: .regulationPickleball)
     let imageSize = CGSize(width: 1280, height: 720)   // frame aspect for the mapper
     let imgCorners = [

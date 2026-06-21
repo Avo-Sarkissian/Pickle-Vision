@@ -3,12 +3,12 @@ import PickleVisionCore
 
 // MARK: - PositionStepView
 
-/// Step 1 — POSITION CHECK.
+/// Step 1 - POSITION CHECK.
 /// Occupies the 204pt control rail. The canvas overlay (framing guide + corner
 /// ticks + fit-the-court caption) is a separate `PositionCanvasOverlay` view
 /// inserted into `CalibrationWizardView.canvasArea` for the `.position` step.
 ///
-/// Continue is ALWAYS enabled — checks are advisory guidance only.
+/// Continue is ALWAYS enabled - checks are advisory guidance only.
 struct PositionStepView: View {
     @ObservedObject var model: CalibrationModel
 
@@ -41,7 +41,7 @@ struct PositionStepView: View {
             )
             .padding(.bottom, 10)
 
-            // Angle row — always amber (advisory "raise" hint)
+            // Angle row - always amber (advisory "raise" hint)
             checkRow(
                 symbol: "exclamationmark.circle.fill",
                 label: "Raise mount ~1 ft",
@@ -49,14 +49,14 @@ struct PositionStepView: View {
             )
 
             // ── Angle note ──────────────────────────────────────────────────
-            Text("A higher angle sharpens near-line calls — but any angle still works.")
+            Text("A higher angle sharpens near-line calls - but any angle still works.")
                 .font(PVFont.mono(9, weight: .regular))
                 .foregroundStyle(PVColor.onDarkDim)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 10)
                 .padding(.bottom, 18)
 
-            // ── Primary CTA — ALWAYS enabled, never .disabled ────────────────
+            // ── Primary CTA - ALWAYS enabled, never .disabled ────────────────
             PrimaryButton("Continue anyway") {
                 model.flow.continueFromPosition()
             }
@@ -68,7 +68,7 @@ struct PositionStepView: View {
             }
 
             // ── Progress caption ─────────────────────────────────────────────
-            Text("\(model.flow.checks.passingCount) / \(model.flow.checks.total) — go anyway")
+            Text("\(model.flow.checks.passingCount) / \(model.flow.checks.total) - go anyway")
                 .font(PVFont.mono(9, weight: .medium))
                 .foregroundStyle(PVColor.onDarkDim)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -179,7 +179,7 @@ struct PositionCanvasOverlay: View {
 
 // MARK: - Preview
 
-#Preview("PositionStepView — rail") {
+#Preview("PositionStepView - rail") {
     let camera = CameraService()
     let model  = CalibrationModel(camera: camera, flow: CalibrationFlow(step: .position))
     return ZStack {

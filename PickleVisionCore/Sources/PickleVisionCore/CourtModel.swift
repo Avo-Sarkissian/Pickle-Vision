@@ -1,6 +1,6 @@
 import CoreGraphics
 
-/// The calibrated court — the single interface every later Pickle Vision phase
+/// The calibrated court - the single interface every later Pickle Vision phase
 /// consumes. Wraps an image→court homography plus the court's real-world geometry.
 public struct CourtModel {
     public let profile: CourtProfile

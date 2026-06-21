@@ -22,7 +22,7 @@ public struct AspectFillMapper {
                                   y: (viewSize.height - contentSize.height * s) / 2)
             self.valid = true
         } else {
-            // Degenerate (zero) size — avoid inf/nan; map to a harmless center.
+            // Degenerate (zero) size - avoid inf/nan; map to a harmless center.
             self.scale = 1
             self.offset = .zero
             self.valid = false

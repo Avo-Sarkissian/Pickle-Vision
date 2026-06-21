@@ -12,7 +12,7 @@ final class CameraService: NSObject, ObservableObject {
 
     @Published private(set) var permission: PermissionState = .unknown
     @Published private(set) var isRunning = false
-    @Published private(set) var selectedFormatDescription = "—"
+    @Published private(set) var selectedFormatDescription = "-"
     @Published private(set) var measuredFPS = 0
     @Published private(set) var thermal = ThermalRecommendation(shouldWarn: false, frameRateCap: nil, message: nil)
     @Published private(set) var latestImage: CGImage?
@@ -239,7 +239,7 @@ final class CameraService: NSObject, ObservableObject {
             guard let self else { return }
 
             // Shutdown reports cap == 0 ("pause capture"). Actually stop the
-            // session so reality matches the "capture paused" banner — otherwise
+            // session so reality matches the "capture paused" banner - otherwise
             // it kept running at full rate at the hottest moment.
             if let cap, cap == 0 {
                 if self.session.isRunning { self.session.stopRunning() }
@@ -250,7 +250,7 @@ final class CameraService: NSObject, ObservableObject {
 
             guard let device = self.device else { return }
 
-            // Pressure eased after a thermal pause — resume capture.
+            // Pressure eased after a thermal pause - resume capture.
             if self.thermalPaused {
                 self.thermalPaused = false
                 if !self.session.isRunning { self.session.startRunning() }
@@ -327,7 +327,7 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
             publishOnMain { self.measuredFPS = fps }
         }
 
-        // Frozen-frame snapshot — only while a calibration freeze is requested,
+        // Frozen-frame snapshot - only while a calibration freeze is requested,
         // so the live camera doesn't build full-resolution CGImages no one reads.
         if snapshotEnabled, let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
             let ci = CIImage(cvPixelBuffer: pixelBuffer)

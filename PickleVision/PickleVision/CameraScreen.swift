@@ -3,7 +3,7 @@ import PickleVisionCore
 
 // MARK: - Decorative Court Guide
 
-/// Faint static trapezoid court guide — decorative, pre-calibration, non-interactive.
+/// Faint static trapezoid court guide - decorative, pre-calibration, non-interactive.
 /// Draws optic-yellow trapezoid + NVZ lines + net line. NOT data-bound to any CourtModel.
 private struct DecorativeCourtGuide: View {
     var lineWidth: CGFloat = 2
@@ -12,7 +12,7 @@ private struct DecorativeCourtGuide: View {
         GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height
-            // Trapezoid: near edge wider (bottom), far edge narrower (top) — court perspective.
+            // Trapezoid: near edge wider (bottom), far edge narrower (top) - court perspective.
             // Inset from edges so it stays clear of corner chrome.
             let nearLeft  = CGPoint(x: w * 0.10, y: h * 0.88)
             let nearRight = CGPoint(x: w * 0.90, y: h * 0.88)
@@ -40,14 +40,14 @@ private struct DecorativeCourtGuide: View {
                 }
                 .stroke(PVColor.optic, lineWidth: lineWidth)
 
-                // NVZ (kitchen) line — near side.
+                // NVZ (kitchen) line - near side.
                 Path { p in
                     p.move(to: nvzLeftNear)
                     p.addLine(to: nvzRightNear)
                 }
                 .stroke(PVColor.optic, lineWidth: max(1, lineWidth - 0.5))
 
-                // NVZ (kitchen) line — far side.
+                // NVZ (kitchen) line - far side.
                 Path { p in
                     p.move(to: nvzLeftFar)
                     p.addLine(to: nvzRightFar)
@@ -129,7 +129,7 @@ struct CameraScreen: View {
         .navigationTitle("Camera")
         .navigationBarTitleDisplayMode(.inline)
         .lockOrientation(.landscape)
-        // Note: we intentionally do NOT stop the session on disappear — pushing
+        // Note: we intentionally do NOT stop the session on disappear - pushing
         // the Calibration screen reuses the same session (and its frame feed).
         .onAppear {
             camera.start(profile: profile)
@@ -140,7 +140,7 @@ struct CameraScreen: View {
         }
         .onChange(of: scenePhase) { _, phase in
             // Stop capture while backgrounded (battery + thermal); restart on
-            // return — which also re-checks permission if it was granted in Settings.
+            // return - which also re-checks permission if it was granted in Settings.
             switch phase {
             case .active:     camera.start(profile: profile)
             case .background: camera.stop()
@@ -198,7 +198,7 @@ struct CameraScreen: View {
         }
     }
 
-    /// Top-left instrument cluster — REC readout + live format + live fps.
+    /// Top-left instrument cluster - REC readout + live format + live fps.
     /// REC elapsed only counts while `camera.isRecording`; idle shows "--:--".
     private var topLeftCluster: some View {
         HStack(spacing: 8) {
@@ -225,7 +225,7 @@ struct CameraScreen: View {
         }
     }
 
-    /// Top-right — amber thermal pill, only when the policy says to warn.
+    /// Top-right - amber thermal pill, only when the policy says to warn.
     @ViewBuilder private var thermalCluster: some View {
         if camera.thermal.shouldWarn, let msg = camera.thermal.message {
             InstrumentPill(systemImage: "thermometer.medium", msg, tint: PVColor.amber)
@@ -269,7 +269,7 @@ struct CameraScreen: View {
 
 #Preview("CameraScreen - with calibrated court overlay") {
     // Build a CourtModel from normalized [0,1] corners (same pattern as CourtOverlay preview).
-    // Order: [nearLeft, nearRight, farRight, farLeft] — near (wide) at bottom, far (narrow) at top.
+    // Order: [nearLeft, nearRight, farRight, farLeft] - near (wide) at bottom, far (narrow) at top.
     let profile = CourtProfile.make(layout: .regulationPickleball)
     let imgCorners = [
         CGPoint(x: 0.18, y: 0.82),  // nearLeft

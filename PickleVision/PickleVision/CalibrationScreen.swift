@@ -4,10 +4,10 @@ import PickleVisionCore
 
 /// Thin host that builds the right `CalibrationModel` and renders
 /// `CalibrationWizardView`. Two entry points:
-///   • Camera-launched (standard):  `init(camera:)` — starts the wizard at Step 1 (Position).
-///   • Express re-calibrate:         `init(camera:, reCalibrate:)` — jumps to Step 3 (Fine-tune)
+///   • Camera-launched (standard):  `init(camera:)` - starts the wizard at Step 1 (Position).
+///   • Express re-calibrate:         `init(camera:, reCalibrate:)` - jumps to Step 3 (Fine-tune)
 ///     with the saved court's corners, layout, custom dimensions, and venue preloaded.
-///   • Convenience `init(reloading:)` — HomeView path; creates a fresh CameraService.
+///   • Convenience `init(reloading:)` - HomeView path; creates a fresh CameraService.
 struct CalibrationScreen: View {
     @ObservedObject var camera: CameraService
     @StateObject private var model: CalibrationModel

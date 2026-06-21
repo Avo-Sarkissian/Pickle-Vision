@@ -203,7 +203,7 @@ struct CalibrationWizardView: View {
                     VerifyCanvasOverlay(model: model)
                 }
 
-                // Status pill — "FROZEN FRAME" on fineTune; "TAP TO TEST THE MAP" on verify
+                // Status pill - "FROZEN FRAME" on fineTune; "TAP TO TEST THE MAP" on verify
                 if model.flow.step == .fineTune {
                     VStack {
                         HStack {
@@ -225,7 +225,7 @@ struct CalibrationWizardView: View {
                     }
                 }
 
-                // Status pill + framing overlay — camera info + guide on position step
+                // Status pill + framing overlay - camera info + guide on position step
                 if model.flow.step == .position {
                     VStack {
                         HStack {
@@ -316,7 +316,7 @@ private struct StubStepView: View {
 
 // MARK: - Preview
 
-#Preview("CalibrationWizardView — position step") {
+#Preview("CalibrationWizardView - position step") {
     let camera = CameraService()
     let model = CalibrationModel(camera: camera,
                                   flow: CalibrationFlow(step: .position))
@@ -325,7 +325,7 @@ private struct StubStepView: View {
         .preferredColorScheme(.dark)
 }
 
-#Preview("CalibrationWizardView — fineTune step") {
+#Preview("CalibrationWizardView - fineTune step") {
     let camera = CameraService()
     let model = CalibrationModel(camera: camera,
                                   flow: CalibrationFlow(step: .fineTune))
@@ -334,7 +334,7 @@ private struct StubStepView: View {
         .preferredColorScheme(.dark)
 }
 
-#Preview("CalibrationWizardView — verify step") {
+#Preview("CalibrationWizardView - verify step") {
     let camera = CameraService()
     let model = CalibrationModel(camera: camera,
                                   flow: CalibrationFlow(step: .verify))

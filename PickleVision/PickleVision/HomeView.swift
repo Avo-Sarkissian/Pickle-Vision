@@ -44,7 +44,7 @@ struct HomeView: View {
                     if let cal = store.load(id: id) {
                         CalibrationScreen(reloading: cal)
                     } else {
-                        // Fallback: court no longer on disk — start fresh camera path.
+                        // Fallback: court no longer on disk - start fresh camera path.
                         CameraScreen(profile: profileStore.profile)
                     }
                 case .calibrate:
@@ -213,7 +213,7 @@ struct HomeView: View {
                 Text("No saved courts yet")
                     .font(PVFont.ui(15, weight: .semibold))
                     .foregroundStyle(PVColor.ink)
-                Text("Calibrated courts live here — set one up and it's one tap to reload next time.")
+                Text("Calibrated courts live here - set one up and it's one tap to reload next time.")
                     .font(PVFont.ui(13))
                     .foregroundStyle(PVColor.mutedLight)
                     .multilineTextAlignment(.center)
@@ -234,7 +234,7 @@ struct HomeView: View {
 
 // MARK: - Empty-state Preview
 
-#Preview("HomeView — empty (first launch)") {
+#Preview("HomeView - empty (first launch)") {
     // Wraps the HomeView logic in a stripped shell with courts = [] so
     // emptyContent renders without any on-disk calibration data.
     struct EmptyHome: View {
@@ -311,7 +311,7 @@ struct HomeView: View {
                                 Text("No saved courts yet")
                                     .font(PVFont.ui(15, weight: .semibold))
                                     .foregroundStyle(PVColor.ink)
-                                Text("Calibrated courts live here — set one up and it's one tap to reload next time.")
+                                Text("Calibrated courts live here - set one up and it's one tap to reload next time.")
                                     .font(PVFont.ui(13))
                                     .foregroundStyle(PVColor.mutedLight)
                                     .multilineTextAlignment(.center)
@@ -344,11 +344,11 @@ struct HomeView: View {
 
 // MARK: - Preview
 
-#Preview("HomeView — populated (3 sample courts)") {
+#Preview("HomeView - populated (3 sample courts)") {
     HomeView()
 }
 
-#Preview("HomeView — populated (injected courts)") {
+#Preview("HomeView - populated (injected courts)") {
     // Uses a temporary CalibrationStore seeded with 3 sample courts so the
     // preview renders the populated state without on-disk data.
     let tmpDir = FileManager.default.temporaryDirectory

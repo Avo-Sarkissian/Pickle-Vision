@@ -51,7 +51,7 @@ struct CameraPreviewView: UIViewRepresentable {
             }
         }
 
-        /// Sets the preview connection's rotation angle (on the main thread —
+        /// Sets the preview connection's rotation angle (on the main thread -
         /// KVO callbacks can arrive off-main from device-motion updates).
         private func apply(_ angle: CGFloat) {
             let layer = previewLayer

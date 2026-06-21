@@ -1,7 +1,7 @@
 import Foundation
 
 /// A user-facing capture-quality preference. Each case is a thin policy over
-/// `CameraFormatSelector(targetHeight:maxFrameRate:)` — the same selector the
+/// `CameraFormatSelector(targetHeight:maxFrameRate:)` - the same selector the
 /// camera already uses. iPhone 16 Pro reality: the main lens does 4K up to 120
 /// and 1080p up to 240, so there is NO 4K·240 case. `ThermalPolicy` still
 /// overrides the effective cap at runtime.

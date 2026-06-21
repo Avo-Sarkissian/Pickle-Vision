@@ -12,7 +12,7 @@ public struct CodablePoint: Codable, Equatable {
 }
 
 /// A persisted court calibration. Identity is a stable `id` (the on-disk
-/// filename), decoupled from the user-editable `venueName` — so two courts can
+/// filename), decoupled from the user-editable `venueName` - so two courts can
 /// share a display name without clobbering each other, and renaming on re-cal
 /// overwrites the same record instead of orphaning the old file. Stores the
 /// tapped image corners and layout, not the homography (recomputed on load).
@@ -159,7 +159,7 @@ public final class CalibrationStore {
     }
 
     /// Recomputes a live `CourtModel` from a stored calibration, or `nil` if the
-    /// corners are missing/degenerate. Uses no instance state — exposed statically
+    /// corners are missing/degenerate. Uses no instance state - exposed statically
     /// so views can build it once without standing up a store.
     public static func courtModel(from calibration: StoredCalibration) -> CourtModel? {
         guard calibration.imageCorners.count == 4 else { return nil }

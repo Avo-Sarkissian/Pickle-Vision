@@ -3,7 +3,7 @@ import PickleVisionCore
 
 // MARK: - AutoDetectStepView
 
-/// Step 2 — AUTO-DETECT.
+/// Step 2 - AUTO-DETECT.
 /// Switches on `model.flow.autoDetect` to render four states:
 ///   .idle    → "Auto-detect" + "Calibrate manually instead"
 ///   .finding → scan band on canvas + spinner + "Calibrate manually instead"
@@ -224,7 +224,7 @@ struct AutoDetectCanvasOverlay: View {
 
     @ViewBuilder
     private var foundOverlay: some View {
-        // "Court found" pill — top-left (no percentage — honesty rule)
+        // "Court found" pill - top-left (no percentage - honesty rule)
         VStack {
             HStack {
                 InstrumentPill(systemImage: "circle.fill", "Court found", tint: PVColor.optic)
@@ -292,7 +292,7 @@ extension CalibrationModel {
 
 // MARK: - Previews
 
-#Preview("AutoDetect — idle") {
+#Preview("AutoDetect - idle") {
     ZStack {
         PVColor.rail.ignoresSafeArea()
         AutoDetectStepView(model: CalibrationModel(camera: CameraService(),
@@ -302,7 +302,7 @@ extension CalibrationModel {
     .preferredColorScheme(.dark)
 }
 
-#Preview("AutoDetect — finding") {
+#Preview("AutoDetect - finding") {
     var flow = CalibrationFlow(step: .detect)
     flow.startAutoDetect()
     return ZStack {
@@ -313,7 +313,7 @@ extension CalibrationModel {
     .preferredColorScheme(.dark)
 }
 
-#Preview("AutoDetect — found") {
+#Preview("AutoDetect - found") {
     var flow = CalibrationFlow(step: .detect)
     flow.resolveAutoDetect(.found, detectedCorners: CalibrationDraft.defaultCorners())
     return ZStack {
@@ -324,7 +324,7 @@ extension CalibrationModel {
     .preferredColorScheme(.dark)
 }
 
-#Preview("AutoDetect — failed") {
+#Preview("AutoDetect - failed") {
     var flow = CalibrationFlow(step: .detect)
     flow.resolveAutoDetect(.failed, detectedCorners: nil)
     return ZStack {

@@ -35,14 +35,14 @@ public struct ThermalPolicy {
         case .serious:
             let cap = min(60, baseFrameRate)
             return ThermalRecommendation(shouldWarn: true, frameRateCap: cap,
-                                         message: "Phone is warming up — reduced to \(Int(cap)) fps.")
+                                         message: "Phone is warming up - reduced to \(Int(cap)) fps.")
         case .critical:
             let cap = min(30, baseFrameRate)
             return ThermalRecommendation(shouldWarn: true, frameRateCap: cap,
-                                         message: "Phone is hot — reduced to \(Int(cap)) fps. Move to shade.")
+                                         message: "Phone is hot - reduced to \(Int(cap)) fps. Move to shade.")
         case .shutdown:
             return ThermalRecommendation(shouldWarn: true, frameRateCap: 0,
-                                         message: "Phone too hot — capture paused to cool down.")
+                                         message: "Phone too hot - capture paused to cool down.")
         }
     }
 }

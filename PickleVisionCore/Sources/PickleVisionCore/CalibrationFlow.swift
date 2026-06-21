@@ -4,7 +4,7 @@ public enum CalibrationStep: Int, CaseIterable, Equatable {
     case position, detect, fineTune, verify
 }
 
-/// ADVISORY ONLY — informs guidance copy, never gates a transition.
+/// ADVISORY ONLY - informs guidance copy, never gates a transition.
 public struct SetupChecks: Equatable {
     public var steady: Bool
     public var framed: Bool
@@ -76,7 +76,7 @@ public struct CalibrationFlow: Equatable {
 
     /// Turns the court overlay on whenever a transition lands on a calibrating
     /// step (fine-tune / verify), so the standard manual path shows the overlay
-    /// to drag — matching express re-cal. The user's toggle can still turn it off
+    /// to drag - matching express re-cal. The user's toggle can still turn it off
     /// while on that step; arriving fresh always defaults it on.
     private mutating func showOverlayIfCalibrating() {
         if step == .fineTune || step == .verify { overlayVisible = true }
@@ -103,10 +103,10 @@ public struct CalibrationFlow: Equatable {
 
     /// "Continue anyway" from Position. Always succeeds regardless of checks.
     public mutating func continueFromPosition() {
-        step = .detect     // ignores checks entirely — no guard
+        step = .detect     // ignores checks entirely - no guard
     }
 
-    /// "Calibrate manually" — skip auto-detect, jump straight to Fine-tune.
+    /// "Calibrate manually" - skip auto-detect, jump straight to Fine-tune.
     /// Always allowed from any step.
     public mutating func calibrateManually() {
         step = .fineTune
@@ -138,7 +138,7 @@ public struct CalibrationFlow: Equatable {
     }
 
     /// From a failed/any auto-detect, drop to the guaranteed manual path.
-    /// Corners remain whatever they are — defaults if detect never populated them.
+    /// Corners remain whatever they are - defaults if detect never populated them.
     public mutating func dropToManual() {
         step = .fineTune
         showOverlayIfCalibrating()

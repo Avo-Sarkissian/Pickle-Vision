@@ -6,10 +6,10 @@ import SwiftUI
 /// Offers a "Switch to 0.5×" option and a "Keep 1×" fallback.
 ///
 /// NOTE: In v1 the 0.5× ultra-wide path has no lens-distortion calibration
-/// engine. "Switch to 0.5×" is a no-op dismiss — intent is recorded only.
-/// TODO: Plan — ultra-wide lens-distortion calibration
+/// engine. "Switch to 0.5×" is a no-op dismiss - intent is recorded only.
+/// TODO: Plan - ultra-wide lens-distortion calibration
 struct UltraWideFallbackCard: View {
-    var onSwitch: () -> Void   // user chose 0.5× (no engine yet — record/intent only)
+    var onSwitch: () -> Void   // user chose 0.5× (no engine yet - record/intent only)
     var onKeep: () -> Void     // keep 1×, dismiss
 
     var body: some View {
@@ -35,7 +35,7 @@ struct UltraWideFallbackCard: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         // Body copy
-                        Text("Switch to the 0.5× ultra-wide. It needs a one-time lens-distortion calibration — its barrel curve would otherwise warp the map.")
+                        Text("Switch to the 0.5× ultra-wide. It needs a one-time lens-distortion calibration - its barrel curve would otherwise warp the map.")
                             .font(PVFont.body)
                             .foregroundStyle(PVColor.onDarkDim)
                             .fixedSize(horizontal: false, vertical: true)
@@ -55,7 +55,7 @@ struct UltraWideFallbackCard: View {
                         // Actions
                         VStack(spacing: 10) {
                             PrimaryButton("Switch to 0.5×") {
-                                // TODO: Plan — ultra-wide lens-distortion calibration
+                                // TODO: Plan - ultra-wide lens-distortion calibration
                                 onSwitch()
                             }
 

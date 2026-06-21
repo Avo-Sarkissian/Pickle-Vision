@@ -169,7 +169,7 @@ struct CustomDimensionsSheet: View {
             k = max(0.5, maxKitchen - 0.5)
             validWidth = w; validLength = l; validKitchen = k
             kitchenText = formatted(k)
-            note = "Kitchen must be under half the length (\(formatted(maxKitchen)) ft). Adjusted to \(formatted(k)) ft — tap Apply to confirm."
+            note = "Kitchen must be under half the length (\(formatted(maxKitchen)) ft). Adjusted to \(formatted(k)) ft - tap Apply to confirm."
             return   // stay open so the adjustment is visible
         }
 

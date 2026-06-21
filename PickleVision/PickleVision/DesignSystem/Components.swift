@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - InstrumentPill
 
-/// Dark status pill — chrome on the camera/calibration screens.
+/// Dark status pill - chrome on the camera/calibration screens.
 /// Fill rgba(8,14,17,0.82), hairline border, mono text.
 struct InstrumentPill: View {
     let systemImage: String?

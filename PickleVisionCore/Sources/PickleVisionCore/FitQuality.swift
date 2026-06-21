@@ -9,7 +9,7 @@ import Foundation
 ///
 /// Why not a reprojection residual? A 4-point DLT is exactly determined, so
 /// reprojecting the very corners it was fit from returns ~0 for ANY non-degenerate
-/// quad — the residual carried no information and always read "Good". This metric
+/// quad - the residual carried no information and always read "Good". This metric
 /// is computed purely from the quad's shape and genuinely varies with placement.
 public enum FitQuality: Equatable {
     case good
@@ -59,7 +59,7 @@ public enum FitQuality: Equatable {
     /// Plausibility of the quad as a perspective image of a rectangle: combines
     /// top/bottom level-ness with left/right symmetry. Returns `.infinity` when
     /// the quad is degenerate (too small), mis-ordered, or non-convex
-    /// (self-intersecting) — which is exactly the placement that should read worst.
+    /// (self-intersecting) - which is exactly the placement that should read worst.
     static func plausibilityScore(_ corners: [CGPoint]) -> Double {
         guard corners.count == 4 else { return .infinity }
         let p = corners.map { (x: Double($0.x), y: Double($0.y)) }
