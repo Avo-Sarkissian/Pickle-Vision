@@ -291,7 +291,7 @@ struct CameraScreen: View {
         }
     }
     .overlay(alignment: .top) {
-        if let model {
+        if model != nil {
             VStack(spacing: 4) {
                 InstrumentPill("Riverside - Court 3", tint: PVColor.optic)
                 Text("Saved map - re-tap with Calibrate if the camera moved")

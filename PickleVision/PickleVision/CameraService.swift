@@ -2,7 +2,7 @@
 import Combine
 import CoreImage
 import QuartzCore
-import PickleVisionCore
+@preconcurrency import PickleVisionCore
 
 /// Owns the capture session. Configuration and start/stop run on a private
 /// session queue (off the main thread, per AVFoundation guidance); all
@@ -27,8 +27,11 @@ final class CameraService: NSObject, ObservableObject {
     private let frameQueue = DispatchQueue(label: "vision.pickle.frames")
     private let videoOutput = AVCaptureVideoDataOutput()
     private let movieOutput = AVCaptureMovieFileOutput()
-    private var recordingCourtID: UUID?
-    private let clipStore = ClipStore(directory: URL.documentsDirectory.appendingPathComponent("clips"))
+    // Accessed from sessionQueue (startRecording/fileOutput delegate) — guarded by sessionQueue, not main actor.
+    nonisolated(unsafe) private var recordingCourtID: UUID?
+    nonisolated(unsafe) private var recordingImageSize: CGSize = CGSize(width: 1920, height: 1080)
+    nonisolated(unsafe) private var recordingFPS: Double = 120
+    nonisolated(unsafe) private let clipStore = ClipStore(directory: URL.documentsDirectory.appendingPathComponent("clips"))
     private var selector = CameraFormatSelector(targetHeight: 1080, maxFrameRate: 120)
     private let thermalPolicy = ThermalPolicy(baseFrameRate: 120)
 
@@ -286,6 +289,10 @@ final class CameraService: NSObject, ObservableObject {
         sessionQueue.async { [weak self] in
             guard let self, !self.movieOutput.isRecording else { return }
             self.recordingCourtID = courtID
+            // Snapshot frame metadata now (on sessionQueue) so the nonisolated
+            // AVCaptureFileOutputRecordingDelegate callback can read them safely.
+            self.recordingImageSize = self.imageSize
+            self.recordingFPS = self.chosenMaxRate
             let name = "\(UUID().uuidString).mov"
             let url = URL.documentsDirectory.appendingPathComponent("clips").appendingPathComponent(name)
             try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -344,17 +351,18 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
 }
 
 extension CameraService: AVCaptureFileOutputRecordingDelegate {
-    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL,
-                    from connections: [AVCaptureConnection], error: Error?) {
+    nonisolated func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL,
+                                from connections: [AVCaptureConnection], error: Error?) {
+        // Use nonisolated(unsafe) snapshot properties set on sessionQueue at record-start.
         let courtID = recordingCourtID ?? UUID()
-        let size = imageSize
-        let fps = Double(chosenMaxRate)
-        publishOnMain { self.isRecording = false }
+        let size = recordingImageSize
+        let fps = recordingFPS
+        DispatchQueue.main.async { self.isRecording = false }
         guard error == nil else { return }   // dismissable failure: just leave isRecording false
         let clip = SessionClip(courtID: courtID, fileName: outputFileURL.lastPathComponent,
                                fps: fps, frameWidth: size.width, frameHeight: size.height,
                                recordedAt: Date())
         try? clipStore.save(clip)
-        publishOnMain { self.lastSavedClip = clip }
+        DispatchQueue.main.async { self.lastSavedClip = clip }
     }
 }
