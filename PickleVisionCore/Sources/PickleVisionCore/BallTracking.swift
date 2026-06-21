@@ -77,17 +77,16 @@ public struct Tracker {
     /// Gaps larger than this (in seconds) are not interpolated.
     public var maxGap: TimeInterval = 0.1
     /// An observation is an outlier when its jump from both neighbours exceeds
-    /// this multiple of the median inter-observation step.
-    public var outlierFactor: Double = 3.0
+    /// this multiple of the median inter-observation step. Internal tuning constant,
+    /// not a public knob: the spec exposes only minConfidence and maxGap.
+    private let outlierFactor: Double = 3.0
 
     public init(
         minConfidence: Double = 0.3,
-        maxGap: TimeInterval = 0.1,
-        outlierFactor: Double = 3.0
+        maxGap: TimeInterval = 0.1
     ) {
         self.minConfidence = minConfidence
         self.maxGap = maxGap
-        self.outlierFactor = outlierFactor
     }
 
     /// Produces a BallTrack from unordered, possibly noisy observations.
@@ -214,6 +213,9 @@ public struct Tracker {
             let b = pts[i + 1]
             let gap = b.time - a.time
 
+            // Only bridge a gap that is clearly wider than the local cadence (>1.5x the
+            // nominal step, so a slightly irregular interval is left untouched) and still
+            // within maxGap (a larger gap is a genuine track discontinuity, not a dropout).
             if gap > nominalStep * 1.5 && gap <= maxGap {
                 // Insert interpolated points to fill the gap
                 let steps = max(1, Int(round(gap / nominalStep))) - 1
@@ -225,6 +227,8 @@ public struct Tracker {
                             y: a.imagePoint.y + t * (b.imagePoint.y - a.imagePoint.y)
                         ),
                         time: a.time + t * gap,
+                        // Interpolated points are inferred, not observed: take the more
+                        // conservative (lower) confidence of the two flanking detections.
                         confidence: min(a.confidence, b.confidence)
                     )
                     result.append(interp)

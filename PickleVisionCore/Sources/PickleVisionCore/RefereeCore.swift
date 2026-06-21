@@ -30,11 +30,11 @@ public struct JudgedBounce: Equatable {
 /// The top-level facade that chains the CV pipeline into line calls.
 ///
 /// Pipeline: BallObservation[] -> Tracker -> BallTrack -> BounceDetector -> [Bounce]
-///   -> for each Bounce: CourtModel.courtPoint + LineJudge.call -> JudgedBounce
+///   -> for each Bounce: LineJudge.call (maps through CourtModel once) -> JudgedBounce
 ///
-/// Skips bounces for which the court mapping fails (non-finite courtPoint) or for
-/// which LineJudge cannot produce a call. This can happen when the bounce image
-/// point projects near the homography's projective vanishing line.
+/// Skips bounces for which LineJudge returns nil -- i.e. the bounce image point
+/// projects to a non-finite court coordinate, which can happen near the homography's
+/// projective vanishing line.
 ///
 /// Phase B3 feeds detector output into evaluate(); Phase B5 measures calls against
 /// tap-test ground truth.
@@ -67,10 +67,12 @@ public struct RefereeCore {
         var result: [JudgedBounce] = []
 
         for bounce in bounces {
-            let cp = court.courtPoint(forImage: bounce.imagePoint)
-            guard cp.x.isFinite && cp.y.isFinite else { continue }
-            guard let call = judge.call(bounce: bounce, court: court) else { continue }
-            result.append(JudgedBounce(bounce: bounce, courtPoint: cp, call: call))
+            // LineJudge maps the bounce once and hands back both the court point and the
+            // call, so the stored courtPoint is exactly what the verdict was computed from.
+            // A nil result means the bounce projected to a non-finite court coordinate
+            // (near the homography's vanishing line) and is dropped.
+            guard let judged = judge.call(bounce: bounce, court: court) else { continue }
+            result.append(JudgedBounce(bounce: bounce, courtPoint: judged.courtPoint, call: judged.call))
         }
 
         // BounceDetector already yields events in time order (it walks samples

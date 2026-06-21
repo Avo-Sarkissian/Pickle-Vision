@@ -69,9 +69,10 @@ public struct BounceDetector {
             // A bounce requires dy to go from positive (falling) to negative (rising).
             guard dyA > 0 && dyB < 0 else { continue }
 
-            // Linear interpolation of the zero-crossing time.
+            // Linear interpolation of the zero-crossing time. Given the guard above
+            // (dyA > 0, dyB < 0), ddy = dyB - dyA is strictly negative, so the division
+            // is always safe -- no zero guard needed.
             let ddy = dyB - dyA
-            guard ddy != 0 else { continue }
             let alpha = -dyA / ddy                    // in [0, 1]
             let dt = b.time - a.time
             let tStar = a.time + alpha * dt

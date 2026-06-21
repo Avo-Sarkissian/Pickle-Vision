@@ -57,9 +57,14 @@ public struct LineJudge {
 
     /// Produces a line call for the given bounce using the supplied court model.
     ///
+    /// Returns both the call and the court point it was derived from, so callers
+    /// (e.g. RefereeCore) reuse the single mapped value instead of recomputing the
+    /// homography themselves -- this keeps the stored court point and the verdict in
+    /// lockstep (no latent desync).
+    ///
     /// Returns `nil` if the bounce image point maps to a non-finite court coordinate
     /// (this can happen when the homography maps near the projective vanishing line).
-    public func call(bounce: Bounce, court: CourtModel) -> LineCall? {
+    public func call(bounce: Bounce, court: CourtModel) -> (courtPoint: CGPoint, call: LineCall)? {
         let cp = court.courtPoint(forImage: bounce.imagePoint)
         guard cp.x.isFinite && cp.y.isFinite else { return nil }
 
@@ -73,6 +78,7 @@ public struct LineJudge {
             verdict = inside ? .in : .out
         }
 
-        return LineCall(verdict: verdict, distanceToLineFeet: d, uncertaintyBandFeet: uncertaintyBandFeet)
+        let call = LineCall(verdict: verdict, distanceToLineFeet: d, uncertaintyBandFeet: uncertaintyBandFeet)
+        return (courtPoint: cp, call: call)
     }
 }
